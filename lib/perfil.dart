@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Login extends StatefulWidget {
+class Perfil extends StatefulWidget {
   @override
-  _LoginState createState() => _LoginState();
+  _PerfilState createState() => _PerfilState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends State<Perfil> {
   //controla o estado do checkbox
   bool check = false;
 
