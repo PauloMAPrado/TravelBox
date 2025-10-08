@@ -23,7 +23,7 @@ class PrimeiraTela extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Login()),
+            MaterialPageRoute(builder: (context) => Perfil()),
           );
         },
         child: Column(
