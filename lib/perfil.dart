@@ -6,7 +6,7 @@ class Perfil extends StatefulWidget {
   _PerfilState createState() => _PerfilState();
 }
 
-class _LoginState extends State<Perfil> {
+class _PerfilState extends State<Perfil> {
   //controla o estado do checkbox
   bool check = false;
 
