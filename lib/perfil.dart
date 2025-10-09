@@ -7,9 +7,6 @@ class Perfil extends StatefulWidget {
 }
 
 class _PerfilState extends State<Perfil> {
-  //controla o estado do checkbox
-  bool check = false;
-
 @override
 Widget build(BuildContext context) {
   return Scaffold(
@@ -18,11 +15,9 @@ Widget build(BuildContext context) {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // PARTE 1: O HEADER AZUL (permanece como estava)
           Stack(
             alignment: Alignment.center,
             children: [
-              // O container azul aqui é importante para definir a altura do header
               Container(
                 width: double.infinity,
                 height: 80,
@@ -35,10 +30,7 @@ Widget build(BuildContext context) {
                 ),
               ),
             ],
-          ),
-        
-          // Na segunda tela deve ter um título no AppBar, um Card com ícone ou imagem e um texto. Deve existir um botão para voltar à tela inicial.
-          
+          ),         
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -54,7 +46,7 @@ Widget build(BuildContext context) {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Login',
+                      'Travel Box',
                       style: GoogleFonts.poppins(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -66,16 +58,22 @@ Widget build(BuildContext context) {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
-
-                           // transformar em botão clicável que redireciona para a tela de login
-                          
                           children: [
-                            Icon(Icons.person, size: 80, color: Colors.blue),
+                              Image.asset(
+                                'assets/images/logosemletra.png',
+                                width: 100,
+                                height: 100,
+                              ),
                             SizedBox(height: 16),
                             Text(
-                              'Bem-vindo de volta! Faça login para continuar.',
+                              'TRAVEL BOX',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(fontSize: 16),
+                              style: GoogleFonts.poppins(fontSize: 30),
+                            ),
+                            Text(
+                              '\n\n Planejando a viagem dos seus sonhos? Não deixe que a preocupação com dinheiro atrapalhe! O Travel Box é o seu assistente financeiro pessoal, criado para simplificar o controle de despesas em suas aventuras pelo mundo. \n',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(fontSize: 20),
                             ),
                           ],
                         ),
@@ -84,7 +82,6 @@ Widget build(BuildContext context) {
                     SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        // Navega para a tela inicial
                         Navigator.pop(context);
                       },
                       child: Text('Voltar'),
