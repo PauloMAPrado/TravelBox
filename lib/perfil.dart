@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'main.dart';
 
 class Perfil extends StatefulWidget {
   @override
@@ -82,7 +83,10 @@ Widget build(BuildContext context) {
                     SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => PrimeiraTela()),
+                        );
                       },
                       child: Text('Voltar'),
                     ),
