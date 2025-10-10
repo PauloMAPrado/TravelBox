@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'login.dart';
 
 class Register extends StatefulWidget {
+  const Register({super.key});
+
   @override
   _RegisterState createState() => _RegisterState();
 }
@@ -20,7 +22,7 @@ Widget build(BuildContext context) {
           Stack(
             alignment: Alignment.center,
             children: [
-              Container(
+              SizedBox(
                 width: double.infinity,
                 height: 120,
               ),
