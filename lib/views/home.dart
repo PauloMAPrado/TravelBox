@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:travelbox/criacofre.dart';
-import 'package:travelbox/entracofre.dart';
+import 'package:travelbox/views/criacofre.dart';
+import 'package:travelbox/views/entracofre.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
