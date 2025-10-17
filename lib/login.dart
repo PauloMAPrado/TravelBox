@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:travelbox/home.dart';
 import 'register.dart';
+import 'recover.dart';
+import 'home.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -19,23 +20,37 @@ Widget build(BuildContext context) {
     body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          //header azul
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: double.infinity,
-                height: 120,
+            //header azul 
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              child: Stack(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: 120,
+                  ),
+                  Positioned(
+                    top: 50,
+                    left: 0,
+                    child: Image.asset(
+                      'assets/images/logosemletra.png',
+                      height: 60,
+                    ),
+                  ),
+                  Positioned(
+                    top: 70,
+                    right: 0,
+                    child: Text(
+                      'Login',
+                      style: GoogleFonts.poppins(
+                          fontSize: 17.0,
+                          color: Color.fromARGB(255, 255, 255, 255),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Positioned(
-                top: 50,
-                child: Image.asset(
-                  'assets/images/logosemletra.png',
-                  height: 60,
-                ),
-              ),
-            ],
-          ),
+            ),
 
           //container
           Expanded(
@@ -107,6 +122,10 @@ Widget build(BuildContext context) {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Recover()),
+                            );
                           },
                           child: Text(
                             'Recuperação de Senha',
@@ -124,7 +143,7 @@ Widget build(BuildContext context) {
                       //Login
                       ElevatedButton(
                         onPressed: () {
-                            Navigator.push(
+                          Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => Home()),
                             );
@@ -175,9 +194,9 @@ Widget build(BuildContext context) {
                         ),
                       ],
                     ),
-     ],
 
-               
+
+                    ],
                   ),
                 ),
             ),
