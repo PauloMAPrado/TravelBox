@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:travelbox/home.dart';
 import 'register.dart';
 
 class Login extends StatefulWidget {
@@ -122,7 +123,12 @@ Widget build(BuildContext context) {
 
                       //Login
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Home()),
+                            );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF1E90FF),
                           padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -169,9 +175,9 @@ Widget build(BuildContext context) {
                         ),
                       ],
                     ),
+     ],
 
-
-                    ],
+               
                   ),
                 ),
             ),
