@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:travelbox/views/criacofre.dart';
 import 'package:travelbox/views/entracofre.dart';
+import 'settings.dart';
+import 'account.dart';
+import 'premium.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -111,8 +114,37 @@ class _HomeState extends State<Home> {
                       ),
 
                       SizedBox(height: 20.0),
-
-
+                    
+                      Spacer(),
+                      Container(
+                        padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.settings, color: Color(0xFF1E90FF)),
+                              iconSize: 40,
+                              onPressed: () {
+                                Navigator.pushNamed(context, 'settings');
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.account_circle, color: Color(0xFF1E90FF)),
+                              iconSize: 40,
+                              onPressed: () {
+                                Navigator.pushNamed(context, 'account');
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.star, color: Color(0xFF1E90FF)),
+                              iconSize: 40,
+                              onPressed: () {
+                                Navigator.pushNamed(context, 'premium');
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
