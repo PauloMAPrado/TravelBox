@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'login.dart';
+import 'package:travelbox/views/login.dart';
+import 'package:travelbox/views/modules/header.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -18,23 +19,8 @@ Widget build(BuildContext context) {
     body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          //header azul
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: double.infinity,
-                height: 120,
-              ),
-              Positioned(
-                top: 50,
-                child: Image.asset(
-                  'assets/images/logosemletra.png',
-                  height: 60,
-                ),
-              ),
-            ],
-          ),
+
+          Header(),
 
           //container
           Expanded(

@@ -3,37 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-// Minimal UserModel used by AccountPage when the external model file is missing.
-class UserModel {
-  final String name;
-  final String email;
-
-  UserModel({required this.name, required this.email});
-}
-
-// Minimal UserProvider implementation to avoid requiring an external file.
-// This keeps a simple in-memory UserModel and notifies listeners on changes.
-class UserProvider extends ChangeNotifier {
-  UserModel? _user;
-  UserModel? get user => _user;
-  set user(UserModel? value) {
-    _user = value;
-    notifyListeners();
-  }
-}
-
-class AccountPage extends StatefulWidget {
-  const AccountPage({super.key});
+class Account extends StatefulWidget {
+  const Account({super.key});
 
   @override
-  State<AccountPage> createState() => _AccountPageState();
+  State<Account> createState() => _AccountPageState();
 }
 
-class _AccountPageState extends State<AccountPage> {
+class _AccountPageState extends State<Account> {
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    final UserModel? user = userProvider.user;
 
     return Scaffold(
       appBar: AppBar(
@@ -49,7 +28,7 @@ class _AccountPageState extends State<AccountPage> {
         ),
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: user == null
+      body: Provider.of<String?>(context) == null
           ? Center(
               child: Text(
                 'Nenhum usuário logado.',
@@ -67,7 +46,7 @@ class _AccountPageState extends State<AccountPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Nome: ${user.name}',
+                    'Nome: Paulo Prado',
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
                         color: Colors.black,
@@ -77,7 +56,7 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Email: ${user.email}',
+                    'Email: paulopradodev@gmail.com',
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
                         color: Colors.black,

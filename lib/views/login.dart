@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:travelbox/views/modules/header.dart';
 import 'register.dart';
 import 'recover.dart';
-import 'home.dart';
+import 'home.dart' as home;
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -21,36 +22,8 @@ Widget build(BuildContext context) {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
             //header azul 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
-              child: Stack(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 120,
-                  ),
-                  Positioned(
-                    top: 50,
-                    left: 0,
-                    child: Image.asset(
-                      'assets/images/logosemletra.png',
-                      height: 60,
-                    ),
-                  ),
-                  Positioned(
-                    top: 70,
-                    right: 0,
-                    child: Text(
-                      'Login',
-                      style: GoogleFonts.poppins(
-                          fontSize: 17.0,
-                          color: Color.fromARGB(255, 255, 255, 255),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+
+          Header(),
 
           //container
           Expanded(
@@ -145,7 +118,7 @@ Widget build(BuildContext context) {
                         onPressed: () {
                           Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => Home()),
+                              MaterialPageRoute(builder: (context) => home.Home()),
                             );
                         },
                         style: ElevatedButton.styleFrom(

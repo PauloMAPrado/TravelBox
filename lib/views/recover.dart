@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:travelbox/views/modules/header.dart';
 
 class Recover extends StatefulWidget {
   const Recover({super.key});
@@ -17,37 +18,8 @@ Widget build(BuildContext context) {
     body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-            //header azul 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
-              child: Stack(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 120,
-                  ),
-                  Positioned(
-                    top: 50,
-                    left: 0,
-                    child: Image.asset(
-                      'assets/images/logosemletra.png',
-                      height: 60,
-                    ),
-                  ),
-                  Positioned(
-                    top: 70,
-                    right: 0,
-                    child: Text(
-                      'Senha',
-                      style: GoogleFonts.poppins(
-                          fontSize: 17.0,
-                          color: Color.fromARGB(255, 255, 255, 255),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+
+          Header(),
 
           //container
           Expanded(

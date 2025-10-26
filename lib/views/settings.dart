@@ -2,14 +2,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class TelaInicial extends StatefulWidget {
-  const TelaInicial({Key? key}) : super(key: key);
+class Settings extends StatefulWidget {
+  const Settings({Key? key}) : super(key: key);
 
   @override
-  State<TelaInicial> createState() => _TelaInicialState();
+  State<Settings> createState() => _SettingsState();
 }
 
-class _TelaInicialState extends State<TelaInicial> {
+class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
