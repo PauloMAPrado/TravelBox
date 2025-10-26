@@ -1,7 +1,6 @@
-// Estrutura basica de uma tela premium oferecendo ofertas especiais de planos
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 class Premium extends StatefulWidget {
   const Premium({super.key});
 
