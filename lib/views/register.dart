@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:travelbox/views/login.dart';
 import 'package:travelbox/views/modules/header.dart';
-import 'package:travelbox/app/core/services/api_service.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
