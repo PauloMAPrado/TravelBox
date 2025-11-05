@@ -1,0 +1,4 @@
+enum NivelPermissao {
+  coordenador,
+  contribuinte,
+}
