@@ -20,7 +20,9 @@ class Usuario {
   String get email => _email;
   String get cpf => _cpf;
 
-  
+  void set novoEmail(String novoEmail) {
+    _email = novoEmail;
+  }
 
   factory Usuario.fromJson(Map<String, dynamic> json) {
     return Usuario(
@@ -34,7 +36,7 @@ class Usuario {
 
   Map<String, dynamic> toJson() {
     return {
-      'id_usuario': _id, 
+      'id_usuario': _id,
       'nome': nome,
       'email': email,
       'cpf': cpf,
@@ -56,22 +58,4 @@ class Usuario {
       cpf: cpf ?? this.cpf,
     );
   }
-
-
-}
-
-void main() {
-  Usuario user1 = Usuario(
-    nome: 'Luis',
-    email: 'luis123@gmail.com',
-    cpf: '123456789',
-    telefone: '40028922',
-  );
-
-  print(user1.nome);
-  print(user1.email);
-  print(user1.telefone);
-  print(user1.cpf);
-
-  user1.nome = "Italo";
 }
