@@ -13,7 +13,7 @@ class Header extends StatelessWidget {
           
         Container(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: Stack(
                 children: [
                   SizedBox(
@@ -21,20 +21,20 @@ class Header extends StatelessWidget {
                     height: 120,
                   ),
                   Positioned(
-                    top: 50,
+                    top: 32,
                     left: 0,
                     child: Image.asset(
                       'assets/images/logosemletra.png',
-                      height: 60,
+                      height: 80,
                     ),
                   ),
                   Positioned(
-                    top: 70,
+                    top: 62,
                     right: 0,
                     child: Text(
                       'CofreTrip',
                       style: GoogleFonts.poppins(
-                          fontSize: 17.0,
+                          fontSize: 20.0,
                           color: Color.fromARGB(255, 255, 255, 255),
                       ),
                     ),
