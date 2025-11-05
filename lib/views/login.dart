@@ -175,7 +175,7 @@ Widget build(BuildContext context) {
             ),
           ),
         ],
-    ),
-  );
+),
+);
 }
 }

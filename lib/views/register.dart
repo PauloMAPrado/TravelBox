@@ -216,7 +216,7 @@ Widget build(BuildContext context) {
             ),
           ),
         ],
-    ),
-  );
+),
+);
 }
 }
