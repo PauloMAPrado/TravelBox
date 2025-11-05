@@ -32,7 +32,7 @@ class Header extends StatelessWidget {
                     top: 70,
                     right: 0,
                     child: Text(
-                      'Travel Box',
+                      'CofreTrip',
                       style: GoogleFonts.poppins(
                           fontSize: 17.0,
                           color: Color.fromARGB(255, 255, 255, 255),
