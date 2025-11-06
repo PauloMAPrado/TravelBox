@@ -4,14 +4,14 @@ import 'package:travelbox/views/modules/footbar.dart';
 import 'package:travelbox/views/modules/header.dart';
 import 'package:travelbox/views/cofre.dart';
 
-class Entracofre extends StatefulWidget {
-  const Entracofre({super.key});
+class Pagamento extends StatefulWidget {
+  const Pagamento({super.key});
 
   @override
-  _EntracofreState createState() => _EntracofreState();
+  _PagamentoState createState() => _PagamentoState();
 }
 
-class _EntracofreState extends State<Entracofre> {
+class _PagamentoState extends State<Pagamento> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,60 +36,41 @@ class _EntracofreState extends State<Entracofre> {
                   children: [
                     SizedBox(height: 40.0),
                     Text(
-                      'Insira o código para entrar no cofre',
+                      'Código de Pagamento:',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 17.0,
                         color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
-
-                    SizedBox(height: 20.0),
-                    TextField(
-                      keyboardType: TextInputType.name,
-                      decoration: InputDecoration(
-                        labelText: 'Código do Cofre',
-                        labelStyle: GoogleFonts.poppins(),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-
+                    SizedBox(height: 10.0),
+                    Text(
+                      '(62) 99520-4949',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 17.0,
+                        color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
-
                     SizedBox(height: 20.0),
-
                     ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
+                      onPressed: () {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => Cofre()),
                         );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF1E90FF),
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
+                      },
+                      child: Text('Copiar Código'),
+
                     ),
-                    child: Text(
-                      'Confirmar Cadastro',
-                      style: GoogleFonts.poppins(
-                          fontSize: 18, color: Colors.white),
-                    ),
-                  ),
                   ],
-                  
                 ),
               ),
             ),
           ),
-          Footbarr(),
-        ],
-      ),
-    );
-  }
-}
+              Footbarr(),
+            ],
+          ),
+        );
+      }
+    }

@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:travelbox/views/criacofre.dart';
-import 'package:travelbox/views/entracofre.dart';
+import 'package:travelbox/views/sharecode.dart';
 import 'package:travelbox/views/modules/footbar.dart';
 import 'package:travelbox/views/modules/header.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class Cofre extends StatefulWidget {
+  const Cofre({super.key});
 
   @override
-  _HomeState createState() => _HomeState();
+  State<Cofre> createState() => _CofreState();
 }
 
-class _HomeState extends State<Home> {
+class _CofreState extends State<Cofre> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +23,7 @@ class _HomeState extends State<Home> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: Color(0xFFF4F9FB),
+                color: Color.fromARGB(255, 149, 225, 255),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(50.0),
                   topRight: Radius.circular(50.0),
@@ -37,7 +36,7 @@ class _HomeState extends State<Home> {
                   children: [
                     SizedBox(height: 250.0),
                     Text(
-                      'Aparentemente você não tem um cofre criado...',
+                      'Bem-vindo ao seu Cofre!',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.lato(
                         fontSize: 18.0,
@@ -47,9 +46,10 @@ class _HomeState extends State<Home> {
                     SizedBox(height: 40.0),
                     ElevatedButton(
                       onPressed: () {
+                        // Direcionar para a tela sharecode.dart
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => Criacofre()),
+                          MaterialPageRoute(builder: (context) => CodigoCofre()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -60,50 +60,22 @@ class _HomeState extends State<Home> {
                         padding: EdgeInsets.symmetric(vertical: 16.0),
                       ),
                       child: Text(
-                        'Criar Cofre',
+                        'Adicionar Itens',
                         style: GoogleFonts.poppins(
-                          fontSize: 16.0,
+                          fontSize: 18,
                           color: Colors.white,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Entracofre()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 255, 179, 72),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 16.0),
-                      ),
-                      child: Text(
-                        'Entre com um código',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16.0,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    Spacer(),
                   ],
                 ),
               ),
             ),
           ),
-
-          Footbarr(),
-
+        Footbarr(),
         ],
-     ),
-);
+      ),
+    );
+  }
 }
-}
+
