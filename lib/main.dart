@@ -16,7 +16,6 @@ void main() async {
   // 3. Inicia o aplicativo.
   runApp(const MyApp());
 }
-// OBSERVAÇÃO: A FUNÇÃO void main() { runApp (MyApp()); } FOI REMOVIDA PARA EVITAR ERRO DE DUPLICAÇÃO.
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
