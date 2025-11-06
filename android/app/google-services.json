@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "427595722527",
+    "project_id": "cofretrip",
+    "storage_bucket": "cofretrip.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427595722527:android:85da690f3280ec76edca2a",
+        "android_client_info": {
+          "package_name": "com.example.travelbox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPAvYjtt08fB1y4hM-eD40PF7Obej8fYA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
