@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Cofre {
   // ID privado, final, mas anulável para novos cofres
-  final int? _idCofre;
+  final String? id;
 
   String nome;
   String? descricao; 
@@ -10,20 +12,14 @@ class Cofre {
   DateTime? dataViagem; 
 
   Cofre({
-    int? idCofre, 
+    this.id, 
     required this.nome,
     required this.valorPlano,
     required this.despesasTotal,
     required this.dataCriacao,
     this.descricao,
     this.dataViagem,
-  }) : _idCofre = idCofre;
-
-  int? get idCofre => _idCofre;
-
-
-
-
+  })
 
 
 
@@ -31,40 +27,36 @@ class Cofre {
   // --- Métodos de Conversão (JSON) ---
 
   /// Cria um objeto Cofre a partir de um mapa JSON (vindo do back-end).
-  factory Cofre.fromJson(Map<String, dynamic> json) {
+  factory Cofre.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data()!;
     return Cofre(
-      idCofre: json['id_cofre'] as int,
-      nome: json['nome'] as String,
-      descricao: json['descricao'] as String?,
-      valorPlano: json['valor_plano'] as int,
-      despesasTotal: json['despesas_total'] as int,
-      
-      // Datas podem vir como String, precisamos convertê-las
-      dataCriacao: DateTime.parse(json['data_criacao'] as String),
-      dataViagem: json['data_viagem'] != null
-          ? DateTime.parse(json['data_viagem'] as String)
+      id: doc.id,
+      nome: data['nome'] as String,
+      descricao: data['descricao'] as String?,
+      valorPlano: data['valor_plano'] as int,
+      despesasTotal: data['despesas_total'] as int,
+      // Converte o Timestamp do Firebase para DateTime
+      dataCriacao: (data['data_criacao'] as Timestamp).toDate(),
+      dataViagem: data['data_viagem'] != null
+          ? (data['data_viagem'] as Timestamp).toDate()
           : null,
     );
   }
 
-  /// Converte o objeto Cofre para um mapa JSON (para enviar ao back-end).
+  /// Converte o objeto Cofre para um mapa JSON (para enviar ao Firebase).
   Map<String, dynamic> toJson() {
     return {
-      'id_cofre': _idCofre,
       'nome': nome,
       'descricao': descricao,
       'valor_plano': valorPlano,
       'despesas_total': despesasTotal,
-      
-      // Converte DateTime de volta para String no formato ISO (ex: "2025-11-05T...")
-      // O back-end geralmente prefere este formato.
-      'data_criacao': dataCriacao.toIso8601String(),
-      'data_viagem': dataViagem?.toIso8601String(), // '?' para lidar com nulo
+      // O Firebase converte DateTime para Timestamp automaticamente
+      'data_criacao': dataCriacao, 
+      'data_viagem': dataViagem,
     };
   }
-
-  // --- Método Utilitário ---
-
+  
+  /// Cria uma cópia do cofre com valores atualizados.
   Cofre copyWith({
     String? nome,
     String? descricao,
@@ -74,7 +66,7 @@ class Cofre {
     DateTime? dataViagem,
   }) {
     return Cofre(
-      idCofre: _idCofre,
+      id: id, // Preserva o ID original
       nome: nome ?? this.nome,
       descricao: descricao ?? this.descricao,
       valorPlano: valorPlano ?? this.valorPlano,
