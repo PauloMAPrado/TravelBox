@@ -1,14 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travelbox/models/statusConvite.dart';
 
 class Convite {
-  final int? _id;
+  final String id;
 
   StatusConvite status;
   DateTime dataEnvio;
 
-  final int idCofre;
-  final int idUsuarioConvidador;
-  final int idUsuarioConvidado;
+  final String idCofre;
+  final String idUsuarioConvidador;
+  final String idUsuarioConvidado;
 
   Convite({
     int? id,
@@ -17,30 +18,27 @@ class Convite {
     required this.idCofre,
     required this.idUsuarioConvidador,
     required this.idUsuarioConvidado,
-  }) : _id = id;
-
-  int? get idConvite => _id;
+  })
 
 
 
-
-
-  factory Convite.fromJson(Map<String, dynamic> json) {
+  factory Convite.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data()!;
     return Convite(
-      id: json['id_convite'] as int,
-      status: StatusConvite.fromString(json['status'] as String),
-      dataEnvio: DateTime.parse(json['data_envio'] as String),
-      idCofre: json['id_cofre'] as int,
-      idUsuarioConvidador: json['id_usuario_convidador'] as int,
-      idUsuarioConvidado: json['id_usuario_convidado'] as int,
+      id: doc.id,
+      status: StatusConvite.fromString(data['status'] as String),
+      dataEnvio: (data['data_envio'] as Timestamp).toDate(),
+      idCofre: data['id_cofre'] as String,
+      idUsuarioConvidador: data['id_usuario_convidador'] as String,
+      idUsuarioConvidado: data['id_usuario_convidado'] as String,
     );
   }
 
+  /// Converte o objeto Convite para um mapa JSON.
   Map<String, dynamic> toJson() {
     return {
-      'id_convite': _id,
-      'status': status.name, // Armazena o enum como string (ex: "pendente")
-      'data_envio': dataEnvio.toIso8601String(),
+      'status': status.name, // Salva o enum como string
+      'data_envio': dataEnvio, // Firebase lida com DateTime
       'id_cofre': idCofre,
       'id_usuario_convidador': idUsuarioConvidador,
       'id_usuario_convidado': idUsuarioConvidado,

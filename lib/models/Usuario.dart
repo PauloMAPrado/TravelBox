@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Usuario {
-  int? _id;
+  final String? id;
 
   String nome;
   String _email;
@@ -7,16 +9,14 @@ class Usuario {
   String _cpf;
 
   Usuario({
-    int? id,
+    this.id,
     required this.nome,
     required String email,
     required String cpf,
     this.telefone,
-  }) : _id = id,
-       _email = email,
+  }) : _email = email,
        _cpf = cpf;
 
-  int? get id => _id;
   String get email => _email;
   String get cpf => _cpf;
 
@@ -24,19 +24,19 @@ class Usuario {
     _email = novoEmail;
   }
 
-  factory Usuario.fromJson(Map<String, dynamic> json) {
+  factory Usuario.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data()!; // Pega o mapa de dados
     return Usuario(
-      id: json['id_usuario'] as int,
-      nome: json['nome'] as String,
-      email: json['email'] as String,
-      cpf: json['cpf'] as String,
-      telefone: json['telefone'] as String?,
+      id: doc.id, // Pega o ID do documento
+      nome: data['nome'] as String,
+      email: data['email'] as String,
+      cpf: data['cpf'] as String,
+      telefone: data['telefone'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id_usuario': _id,
       'nome': nome,
       'email': email,
       'cpf': cpf,
@@ -51,7 +51,7 @@ class Usuario {
     String? cpf,
   }) {
     return Usuario(
-      id: _id,
+      id: id,
       nome: nome ?? this.nome,
       email: email ?? this.email,
       telefone: telefone ?? this.telefone,
