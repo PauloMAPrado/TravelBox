@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'cofretrip.firebasestorage.app',
     measurementId: 'G-JC0GCBCF7W',
   );
+
 }

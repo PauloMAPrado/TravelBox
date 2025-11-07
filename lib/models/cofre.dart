@@ -5,24 +5,21 @@ class Cofre {
   final String? id;
 
   String nome;
-  String? descricao; 
+  String? descricao;
   int valorPlano;
   int despesasTotal;
   DateTime dataCriacao;
-  DateTime? dataViagem; 
+  DateTime? dataViagem;
 
   Cofre({
-    this.id, 
+    this.id,
     required this.nome,
     required this.valorPlano,
     required this.despesasTotal,
     required this.dataCriacao,
     this.descricao,
     this.dataViagem,
-  })
-
-
-
+  });
 
   // --- Métodos de Conversão (JSON) ---
 
@@ -51,11 +48,11 @@ class Cofre {
       'valor_plano': valorPlano,
       'despesas_total': despesasTotal,
       // O Firebase converte DateTime para Timestamp automaticamente
-      'data_criacao': dataCriacao, 
+      'data_criacao': dataCriacao,
       'data_viagem': dataViagem,
     };
   }
-  
+
   /// Cria uma cópia do cofre com valores atualizados.
   Cofre copyWith({
     String? nome,

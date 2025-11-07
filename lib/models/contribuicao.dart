@@ -16,19 +16,17 @@ class Contribuicao {
     required this.data,
     required this.idUsuario,
     required this.idCofre,
-  })
+  });
 
-
-
-
-
-  factory Contribuicao.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory Contribuicao.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
     return Contribuicao(
       id: doc.id,
-      valor: (data['valor'] as num).toDouble(), 
+      valor: (data['valor'] as num).toDouble(),
       // O Firestore armazena datas como 'Timestamp'. Convertemos para DateTime.
-      data: (data['data'] as Timestamp).toDate(), 
+      data: (data['data'] as Timestamp).toDate(),
       idUsuario: data['id_usuario'] as String,
       idCofre: data['id_cofre'] as String,
     );
@@ -37,7 +35,8 @@ class Contribuicao {
   Map<String, dynamic> toJson() {
     return {
       'valor': valor,
-      'data': data, // O Firestore entende objetos DateTime e converte para Timestamp
+      'data':
+          data, // O Firestore entende objetos DateTime e converte para Timestamp
       'id_usuario': idUsuario,
       'id_cofre': idCofre,
     };

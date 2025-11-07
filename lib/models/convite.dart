@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travelbox/models/statusConvite.dart';
 
 class Convite {
-  final String id;
+  final String? id;
 
   StatusConvite status;
   DateTime dataEnvio;
@@ -12,15 +12,13 @@ class Convite {
   final String idUsuarioConvidado;
 
   Convite({
-    int? id,
+    this.id,
     required this.status,
     required this.dataEnvio,
     required this.idCofre,
     required this.idUsuarioConvidador,
     required this.idUsuarioConvidado,
-  })
-
-
+  });
 
   factory Convite.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
@@ -44,5 +42,4 @@ class Convite {
       'id_usuario_convidado': idUsuarioConvidado,
     };
   }
-
 }

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travelbox/models/nivelPermissao.dart';
 
-
 class Permissao {
   final String? id;
 
@@ -15,9 +14,7 @@ class Permissao {
     required this.nivelPermissao,
     required this.idUsuario,
     required this.idCofre,
-  })
-
-
+  });
 
   /// Converte um Documento do Firestore em um objeto Permissao.
   factory Permissao.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -25,7 +22,9 @@ class Permissao {
     return Permissao(
       id: doc.id,
       // Usa o helper 'fromString' do nosso enum
-      nivelPermissao: NivelPermissao.fromString(data['nivel_permissao'] as String),
+      nivelPermissao: NivelPermissao.fromString(
+        data['nivel_permissao'] as String,
+      ),
       idUsuario: data['id_usuario'] as String,
       idCofre: data['id_cofre'] as String,
     );
@@ -35,7 +34,7 @@ class Permissao {
   Map<String, dynamic> toJson() {
     return {
       // Salva o enum como uma string (ex: "admin")
-      'nivel_permissao': nivelPermissao.name, 
+      'nivel_permissao': nivelPermissao.name,
       'id_usuario': idUsuario,
       'id_cofre': idCofre,
     };
