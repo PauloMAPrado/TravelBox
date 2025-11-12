@@ -54,4 +54,21 @@ class AuthService {
   // ------------------------------------------
   // Este stream é ótimo para redirecionar o usuário automaticamente
   Stream<User?> get userChanges => _auth.authStateChanges();
+
+  Future<String?> resetPassword(String email) async {
+    try {
+      // 1. O Firebase envia o e-mail de redefinição para o endereço fornecido.
+      await _auth.sendPasswordResetEmail(email: email);
+      
+      // Retorna null (sucesso)
+      return null; 
+    } on FirebaseAuthException catch (e) {
+      // 2. Retorna o código do erro (ex: user-not-found)
+      print("Erro ao solicitar recuperação de senha: ${e.code}");
+      return e.code;
+    } catch (e) {
+      print("Erro desconhecido na recuperação de senha: $e");
+      return 'unknown-error';
+    }
+  }
 }
