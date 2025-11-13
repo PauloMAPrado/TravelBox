@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:travelbox/views/modules/footbar.dart';
 import 'package:travelbox/views/modules/header.dart';
-import 'package:travelbox/views/cofre.dart';
+import 'home.dart'; // Importa a tela principal (Dashboard)
 import 'package:cloud_firestore/cloud_firestore.dart'; // Necessário para o Timestamp
-import '../models/cofre_service.dart'; // NOVO: Serviço para lógica do Cofre
+import '../models/cofre_service.dart'; // Serviço para lógica do Cofre
 
 class Entracofre extends StatefulWidget {
   const Entracofre({super.key});
@@ -36,7 +36,7 @@ class _EntracofreState extends State<Entracofre> {
       _isLoading = true;
     });
 
-    final codigoAcesso = _codigoController.text.trim().toUpperCase(); // Limpar e padronizar
+    final codigoAcesso = _codigoController.text.trim().toUpperCase();
 
     if (codigoAcesso.isEmpty) {
       _showSnackBar('Insira um código de acesso.', isError: true);
@@ -46,7 +46,7 @@ class _EntracofreState extends State<Entracofre> {
       return;
     }
 
-    // Assume que a função joinCofre retornará os dados do cofre ou um Map de erro.
+    // Chama o serviço para tentar entrar no cofre
     Map<String, dynamic>? cofreData = await _cofreService.joinCofre(
       codigoAcesso: codigoAcesso,
     );
@@ -60,14 +60,14 @@ class _EntracofreState extends State<Entracofre> {
       final nome = cofreData['nome'];
       _showSnackBar('Cofre "$nome" acessado com sucesso!', isError: false);
 
-      // CORREÇÃO: Navega para a tela Cofre passando os dados
+      // Navega para a tela HOME (agora é o Dashboard)
       if (mounted) {
-        // Converte o Timestamp (do Firestore) para DateTime para o construtor da tela
+        // Converte o Timestamp (do Firestore) para DateTime
         DateTime dataInicioDateTime = (cofreData['dataInicio'] as Timestamp).toDate();
 
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => Cofre(
+            builder: (context) => Home( // NAVEGAÇÃO FINAL
               cofreNome: nome,
               valorAlvo: (cofreData['valorAlvo'] as num).toDouble(),
               valorAtual: (cofreData['valorAtual'] as num).toDouble(),
@@ -88,6 +88,8 @@ class _EntracofreState extends State<Entracofre> {
           message = 'Você já é membro deste cofre.';
         } else if (errorCode == 'user-not-logged-in') {
           message = 'Você precisa estar logado.';
+        } else {
+          message = 'Erro no servidor. Tente mais tarde.';
         }
       }
       _showSnackBar(message, isError: true);
@@ -103,7 +105,6 @@ class _EntracofreState extends State<Entracofre> {
 
   @override
   Widget build(BuildContext context) {
-    // OBS: Adicionei 'const' em vários lugares para otimização
     return Scaffold(
       backgroundColor: const Color(0xFF1E90FF),
       body: Column(
@@ -137,9 +138,9 @@ class _EntracofreState extends State<Entracofre> {
                     const SizedBox(height: 20.0),
                     // CAMPO PARA CÓDIGO
                     TextField(
-                      controller: _codigoController, // LIGADO AO CONTROLADOR
-                      keyboardType: TextInputType.text, // MANTIDO como text (código alfanumérico)
-                      textCapitalization: TextCapitalization.characters, // Facilita input de código
+                      controller: _codigoController,
+                      keyboardType: TextInputType.text,
+                      textCapitalization: TextCapitalization.characters,
                       decoration: InputDecoration(
                         labelText: 'Código do Cofre',
                         labelStyle: GoogleFonts.poppins(),
@@ -155,7 +156,7 @@ class _EntracofreState extends State<Entracofre> {
 
                     // BOTÃO DE CONFIRMAR
                     ElevatedButton(
-                      onPressed: _isLoading ? null : _handleJoinCofre, // LIGADO À LÓGICA
+                      onPressed: _isLoading ? null : _handleJoinCofre, 
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1E90FF),
                         padding: const EdgeInsets.symmetric(vertical: 16.0),

@@ -133,4 +133,17 @@ class CofreService {
       return {'error': 'firestore-error'};
     }
   }
+
+  Stream<QuerySnapshot> streamUserCofres() {
+    User? currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      // Retorna um stream vazio se o usuário não estiver logado
+      return const Stream.empty();
+    }
+
+    // Retorna um stream que monitora os cofres onde o UID do usuário está na lista 'membros'
+    return _firestore.collection('cofres')
+        .where('membros', arrayContains: currentUser.uid)
+        .snapshots();
+  }
 }
