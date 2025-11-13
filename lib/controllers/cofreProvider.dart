@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:travelbox/models/cofre.dart';
-import 'package:travelbox/services/firestoreService.dart';
+import 'package:travelbox/services/FirestoreService.dart';
 
 // 1. A CLASSE BASE
 // ChangeNotifier é a "mágica" do Provider.
@@ -57,6 +57,7 @@ class CofreProvider extends ChangeNotifier {
         valorPlano: valorPlano,
         despesasTotal: 0,
         dataCriacao: DateTime.now(),
+        joinCode: '',
       );
       
       // Chama o Service (a Cozinha)
