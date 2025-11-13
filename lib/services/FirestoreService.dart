@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travelbox/models/cofre.dart';
 import 'package:travelbox/models/contribuicao.dart';
+import 'package:travelbox/models/nivelPermissao.dart';
 import 'package:travelbox/models/permissao.dart';
 import 'package:travelbox/models/Usuario.dart';
-import 'package:travelbox/models/convite.dart'; // Adicionado
+import 'package:travelbox/models/convite.dart'; 
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -26,11 +27,23 @@ class FirestoreService {
 
   // ----- MÉTODOS DE COFRE -----
 
-  /// Cria um novo cofre e retorna o objeto Cofre com o ID gerado.
-  Future<Cofre> criarCofre(Cofre cofre) async {
-    final docRef = _db.collection('cofres').doc();
+  Future<Cofre> criarCofre(Cofre cofre, String creatorUserId) async {
+    final docRef = _db.collection('cofres').doc(); 
+    
+    // Usa o copyWith para adicionar o ID gerado
     Cofre cofreComId = cofre.copyWith(id: docRef.id);
     await docRef.set(cofreComId.toJson());
+    
+    // !! IMPORTANTE: Adiciona o criador como Admin
+    Permissao adminPerm = Permissao(
+      id: null, // O Firestore vai gerar o ID
+      idUsuario: creatorUserId,
+      idCofre: cofreComId.id!,
+      nivelPermissao: NivelPermissao.coordenador,
+    );
+    // Chama o método para criar a permissão
+    await criarPermissao(adminPerm);
+    
     return cofreComId;
   }
 
