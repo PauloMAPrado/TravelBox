@@ -68,4 +68,19 @@ class AuthService {
   Future<void> signOut() async {
     await _auth.signOut();
   }
+
+  Future<String?> resetPassword({required String email}) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return null; // Sucesso
+    } on FirebaseAuthException catch (e) {
+      // Retorna a mensagem de erro específica do Firebase (ex: "user-not-found")
+      return e.message; 
+    } catch (e) {
+      // Retorna qualquer outro erro desconhecido
+      return e.toString();
+    }
+  }
+
 }
+
