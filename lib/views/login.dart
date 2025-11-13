@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:travelbox/views/modules/header.dart';
-import '../models/auth_service.dart'; 
+import '../services/AuthService.dart'; 
 import 'package:firebase_auth/firebase_auth.dart'; 
 
 import 'register.dart';

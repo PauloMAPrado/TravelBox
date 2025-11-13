@@ -4,7 +4,7 @@ import 'package:travelbox/views/modules/footbar.dart';
 import 'package:travelbox/views/modules/header.dart';
 import 'home.dart'; // Importa a tela principal (Dashboard)
 import 'package:cloud_firestore/cloud_firestore.dart'; // Necessário para o Timestamp
-import '../models/cofre_service.dart'; // Serviço para lógica do Cofre
+import '../services/FirestoreService.dart'; // Serviço para lógica do Cofre
 
 class Entracofre extends StatefulWidget {
   const Entracofre({super.key});
