@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:travelbox/views/modules/header.dart';
+//import 'package:travelbox/services/AuthService.dart'; // Importe o serviço
+//import 'package:travelbox/services/FirestoreService.dart'; // Importe a dependência
 
 class Recover extends StatefulWidget {
   const Recover({super.key});
