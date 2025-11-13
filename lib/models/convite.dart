@@ -32,6 +32,7 @@ class Convite {
     );
   }
 
+
   /// Converte o objeto Convite para um mapa JSON.
   Map<String, dynamic> toJson() {
     return {
@@ -42,4 +43,25 @@ class Convite {
       'id_usuario_convidado': idUsuarioConvidado,
     };
   }
+
+  
+  Convite copyWith({
+    String? id,
+    StatusConvite? status,
+    DateTime? dataEnvio,
+    String? idCofre,
+    String? idUsuarioConvidador,
+    String? idUsuarioConvidado,
+  }) {
+    return Convite(
+      id: id ?? this.id,
+      status: status ?? this.status,
+      dataEnvio: dataEnvio ?? this.dataEnvio,
+      idCofre: idCofre ?? this.idCofre,
+      idUsuarioConvidador: idUsuarioConvidador ?? this.idUsuarioConvidador,
+      idUsuarioConvidado: idUsuarioConvidado ?? this.idUsuarioConvidado,
+    );
+  }
+
+
 }
