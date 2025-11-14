@@ -9,7 +9,7 @@ import 'package:travelbox/models/convite.dart';
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // ----- MÉTODOS DE USUÁRIO -----
+  // ========================== MÉTODOS DE USUÁRIO ========================================
 
   /// Cria o documento de um usuário na coleção 'users'.
   Future<void> criarUsuario(Usuario usuario) async {
@@ -20,13 +20,17 @@ class FirestoreService {
   Future<Usuario?> getUsuario(String uid) async {
     final doc = await _db.collection('users').doc(uid).get();
     if (doc.exists) {
-      return Usuario.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>);
+      return Usuario.fromFirestore(doc);
     }
     return null;
   }
 
-  // ----- MÉTODOS DE COFRE -----
 
+
+  // ========================== MÉTODOS DE COFRE ========================================
+
+
+  /// Cria um novo cofre E JÁ ADICIONA O CRIADOR COMO ADMIN
   Future<Cofre> criarCofre(Cofre cofre, String creatorUserId) async {
     final docRef = _db.collection('cofres').doc(); 
     
@@ -47,35 +51,102 @@ class FirestoreService {
     return cofreComId;
   }
 
+  /// MÉTODO NOVO: Encontra um cofre pelo seu código de entrada
+  Future<Cofre?> findCofreByCode(String code) async {
+    // Busca na coleção 'cofres' onde o 'joinCode' é igual ao código
+    final snapshot = await _db
+        .collection('cofres')
+        .where('joinCode', isEqualTo: code)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      return null; // Nenhum cofre encontrado
+    }
+    
+    // Retorna o primeiro cofre encontrado
+    return Cofre.fromFirestore(snapshot.docs.first);
+  }
+
+  /// MÉTODO NOVO (ou atualizado): Adiciona uma permissão
+  /// (Usado tanto pelo criador quanto por quem entra)
+  Future<void> criarPermissao(Permissao permissao) async {
+    // Primeiro, verifica se a permissão já existe
+    final existing = await _db.collection('permissoes')
+      .where('idUsuario', isEqualTo: permissao.idUsuario)
+      .where('idCofre', isEqualTo: permissao.idCofre)
+      .limit(1)
+      .get();
+      
+    // Se não existir, cria a nova permissão
+    if (existing.docs.isEmpty) {
+      await _db.collection('permissoes').add(permissao.toJson());
+    }
+    // Se já existir, não faz nada (usuário já está no cofre)
+  }
+
   /// Busca todos os cofres aos quais um usuário tem permissão.
   Future<List<Cofre>> getCofresDoUsuario(String userId) async {
     try {
+      // 1. Busca todas as permissões desse usuário (igual a antes)
       final permissoesSnap = await _db
           .collection('permissoes')
           .where('idUsuario', isEqualTo: userId)
           .get();
 
+      // 2. Extrai os IDs dos cofres (igual a antes)
       final cofreIds = permissoesSnap.docs
-          .map((doc) => doc.data()['idCofre'] as String)
-          .toSet() 
+          .map((doc) => (doc.data())['idCofre'] as String)
+          .toSet()
           .toList();
 
       if (cofreIds.isEmpty) {
-        return [];
+        return []; // Usuário não tem permissão em nenhum cofre
+      }
+
+
+
+      // ----- NOVA LÓGICA DE FATIAMENTO (CHUNKING) -----
+      
+      // 3. Prepara a lista final onde todos os resultados serão combinados
+      final List<Cofre> todosOsCofres = [];
+      
+      // 4. Define o tamanho do "fatiador"
+      const int chunkSize = 10;
+
+      // 5. Loop que avança de 10 em 10 (i = 0, i = 10, i = 20, ...)
+      for (int i = 0; i < cofreIds.length; i += chunkSize) {
+        
+        // 6. Calcula o índice final do pedaço (chunk)
+        // Cuidado para não ultrapassar o final da lista
+        int end = (i + chunkSize > cofreIds.length) ? cofreIds.length : i + chunkSize;
+        
+        // 7. Pega a sub-lista (o "pedaço" de no máximo 10 IDs)
+        final List<String> chunk = cofreIds.sublist(i, end);
+
+        // 8. Executa a consulta APENAS para esse pedaço
+        final cofresSnap = await _db
+            .collection('cofres')
+            .where(FieldPath.documentId, whereIn: chunk) // 'chunk' tem no máx. 10 itens
+            .get();
+
+        // 9. Converte os documentos e adiciona na lista final
+        todosOsCofres.addAll(
+          cofresSnap.docs.map((doc) => Cofre.fromFirestore(doc)).toList()
+        );
       }
       
-      // Nota: o whereIn tem limite de 10 itens! Se houver mais, precisa de queries separadas.
-      final cofresSnap = await _db
-          .collection('cofres')
-          .where(FieldPath.documentId, whereIn: cofreIds)
-          .get();
+      // 10. Retorna a lista combinada de todas as consultas
+      return todosOsCofres;
 
-      return cofresSnap.docs.map((doc) => Cofre.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)).toList();
     } catch (e) {
       print("Erro ao buscar cofres: $e");
       return [];
     }
   }
+
+//========================= Cofre Finalizado ======================================
+
 
   // ----- MÉTODOS DE CONTRIBUIÇÃO -----
 

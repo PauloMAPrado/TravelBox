@@ -1,10 +1,9 @@
+import 'package:travelbox/services/FirestoreService.dart';
 import 'package:flutter/material.dart';
 import 'package:travelbox/models/cofre.dart';
-import 'package:travelbox/services/FirestoreService.dart';
+import 'package:travelbox/models/permissao.dart';
+import 'package:travelbox/models/nivelPermissao.dart';
 
-// 1. A CLASSE BASE
-// ChangeNotifier é a "mágica" do Provider.
-// Ele dá o poder de "notificar" os ouvintes.
 class CofreProvider extends ChangeNotifier {
 
   // 2. DEPENDÊNCIA DO SERVICE (A "COZINHA")
@@ -12,68 +11,83 @@ class CofreProvider extends ChangeNotifier {
   final FirestoreService _firestoreService;
   CofreProvider(this._firestoreService);
 
-  // 3. O "ESTADO" (OS DADOS)
-  // Dados privados que a tela vai precisar.
   List<Cofre> _cofres = [];
+  List<Cofre> get cofres => _cofres;
   bool _isLoading = false;
   String? _errorMessage;
+  // ...
 
-  // 4. OS "GETTERS" (A LEITURA)
-  // A forma pública e "somente-leitura" da UI acessar o estado.
-  List<Cofre> get cofres => _cofres;
-  bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
-
-  // 5. AS "AÇÕES" (A LÓGICA)
-  // Funções públicas que a UI pode chamar.
-
-  // Ação de CARREGAR os cofres (ex: quando a tela abre)
-  Future<void> buscarCofresDoUsuario(String userId) async {
+  // ATUALIZAÇÃO: salvarCofre agora precisa saber QUEM está criando
+  Future<bool> salvarCofre(String nome, int valorPlano, String creatorUserId) async {
     _isLoading = true;
     _errorMessage = null;
-    notifyListeners(); // Notifica a UI: "Comecei a carregar!"
+    notifyListeners();
 
     try {
-      // Chama o Service (a Cozinha)
-      _cofres = await _firestoreService.getCofresDoUsuario(userId);
-
-    } catch (e) {
-      _errorMessage = e.toString();
-    }
-    
-    _isLoading = false;
-    notifyListeners(); // Notifica a UI: "Terminei! (com sucesso ou erro)"
-  }
-
-  // Ação de SALVAR um novo cofre (ex: botão de salvar)
-  Future<bool> salvarCofre(String nome, int valorPlano) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners(); // Notifica a UI: "Estou salvando..."
-
-    try {
-      Cofre novoCofre = Cofre(
+      // Usamos nosso novo factory 'Cofre.novo'
+      Cofre novoCofre = Cofre.novo(
         nome: nome,
         valorPlano: valorPlano,
-        despesasTotal: 0,
-        dataCriacao: DateTime.now(),
-        joinCode: '',
       );
       
-      // Chama o Service (a Cozinha)
-      Cofre cofreSalvo = await _firestoreService.criarCofre(novoCofre);
+      // Passa o cofre e o ID do criador para o service
+      Cofre cofreSalvo = await _firestoreService.criarCofre(novoCofre, creatorUserId);
       
-      _cofres.add(cofreSalvo); // Atualiza o estado interno
+      _cofres.add(cofreSalvo); // Adiciona o novo cofre à lista local
       
       _isLoading = false;
-      notifyListeners(); // Notifica a UI: "Terminei de salvar!"
-      return true; // Retorna 'true' para a UI (sucesso)
+      notifyListeners();
+      return true;
 
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = "Erro ao salvar cofre: ${e.toString()}";
       _isLoading = false;
-      notifyListeners(); // Notifica a UI: "Deu erro!"
-      return false; // Retorna 'false' para a UI (falha)
+      notifyListeners();
+      return false; // Return false on error
+    }
+  }
+
+  /// NOVA AÇÃO: Entrar em um cofre existente com um código
+  /// Retorna (null) em sucesso, ou (String de erro) em falha.
+  Future<String?> entrarComCodigo(String code, String userId) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // 1. Acha o cofre pelo código
+      // Normaliza o código para maiúsculas para facilitar a digitação
+      final cofre = await _firestoreService.findCofreByCode(code.toUpperCase().trim());
+
+      if (cofre == null) {
+        _isLoading = false;
+        notifyListeners();
+        return "Código inválido. Verifique e tente novamente.";
+      }
+      
+      // 2. Cria uma permissão de "leitor" (ou 'membro', 'editor', etc)
+      Permissao novaPermissao = Permissao(
+        id: null,
+        idUsuario: userId,
+        idCofre: cofre.id!,
+        nivelPermissao: NivelPermissao.contribuinte, // Nível padrão para quem entra
+      );
+
+      // 3. Salva a permissão
+      await _firestoreService.criarPermissao(novaPermissao);
+
+      // 4. (Opcional) Adiciona o cofre à lista local
+      if (!_cofres.any((c) => c.id == cofre.id)) {
+        _cofres.add(cofre);
+      }
+      
+      _isLoading = false;
+      notifyListeners();
+      return null; // Sucesso!
+
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      return "Erro ao tentar entrar no cofre: ${e.toString()}";
     }
   }
 }
