@@ -15,6 +15,9 @@ class CofreProvider extends ChangeNotifier {
   List<Cofre> get cofres => _cofres;
   bool _isLoading = false;
   String? _errorMessage;
+
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
   // ...
 
   // ATUALIZAÇÃO: salvarCofre agora precisa saber QUEM está criando
