@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
-import 'views/login.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+// Linha original //
+// import 'package:travelbox/views/PrimeiraTela.dart';
+
+// Linha para teste
+import 'package:travelbox/views/criacofre.dart';
+
 // Importa o arquivo gerado pelo flutterfire configure:
 import 'firebase_options.dart'; 
 
@@ -25,35 +31,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // A primeira tela será a 'PrimeiraTela' (Splash Screen).
-      home: PrimeiraTela(), 
-    );
-  }
-}
 
-// Primeira tela (Splash Screen)
-class PrimeiraTela extends StatelessWidget {
-  const PrimeiraTela({super.key});
+      // Linha original //
+      // home: PrimeiraTela(),
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F9FB),
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          // Navega para a tela de Login ao tocar em qualquer lugar
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Login()),
-          );
-        },
-        child: Center(
-          child: Image.asset(
-            'assets/images/logo.png',
-            width: 250,
-          ),
-        ),
-      ),
+      // Linha para teste
+      home: Criacofre(),
+      
     );
   }
 }

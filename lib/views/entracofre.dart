@@ -3,8 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:travelbox/views/modules/footbar.dart';
 import 'package:travelbox/views/modules/header.dart';
 import 'package:travelbox/views/cofre.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Necessário para o Timestamp
-import '../models/cofre_service.dart'; // NOVO: Serviço para lógica do Cofre
+// import 'package:cloud_firestore/cloud_firestore.dart'; // Removido (detalhe de back-end)
+// import '../models/cofre_service.dart'; // Removido (será chamado pelo Provider)
+
+// TODO: Importe seu Provider/Gerenciador de Estado aqui
+// ex: import 'package:provider/provider.dart';
+// ex: import 'package:travelbox/providers/cofre_provider.dart';
 
 class Entracofre extends StatefulWidget {
   const Entracofre({super.key});
@@ -14,10 +18,11 @@ class Entracofre extends StatefulWidget {
 }
 
 class _EntracofreState extends State<Entracofre> {
-  // --- Controladores e Serviços ---
+  // --- Controladores (Estado local da UI) ---
   final TextEditingController _codigoController = TextEditingController();
-  final CofreService _cofreService = CofreService();
-  bool _isLoading = false;
+
+  // --- _cofreService e _isLoading REMOVIDOS ---
+  // A responsabilidade agora é do gerenciador de estado
 
   void _showSnackBar(String message, {bool isError = false}) {
     if (!mounted) return;
@@ -30,68 +35,32 @@ class _EntracofreState extends State<Entracofre> {
     );
   }
 
-  // --- Lógica de Entrar no Cofre ---
-  void _handleJoinCofre() async {
-    setState(() {
-      _isLoading = true;
-    });
+  // --- Lógica da View: Apenas "dispara" o evento ---
+  void _handleJoinCofre() {
+    // 1. Pega os dados da UI
+    final codigoAcesso = _codigoController.text.trim().toUpperCase();
 
-    final codigoAcesso = _codigoController.text.trim().toUpperCase(); // Limpar e padronizar
-
+    // 2. Validação local da UI
     if (codigoAcesso.isEmpty) {
       _showSnackBar('Insira um código de acesso.', isError: true);
-      setState(() {
-        _isLoading = false;
-      });
       return;
     }
 
-    // Assume que a função joinCofre retornará os dados do cofre ou um Map de erro.
-    Map<String, dynamic>? cofreData = await _cofreService.joinCofre(
-      codigoAcesso: codigoAcesso,
-    );
+    // 3. "Dispara" o evento para o gerenciador de estado
+    // A View não é 'async' e não espera resposta.
+    
+    // TODO: Chame seu gerenciador de estado aqui
+    // Exemplo com Provider:
+    // context.read<SeuCofreProvider>().joinCofre(
+    //   codigoAcesso: codigoAcesso,
+    // );
+    
+    // Exemplo com Riverpod:
+    // ref.read(seuCofreProvider.notifier).joinCofre(
+    //   codigoAcesso: codigoAcesso,
+    // );
 
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (cofreData != null && !cofreData.containsKey('error')) {
-      // SUCESSO!
-      final nome = cofreData['nome'];
-      _showSnackBar('Cofre "$nome" acessado com sucesso!', isError: false);
-
-      // CORREÇÃO: Navega para a tela Cofre passando os dados
-      if (mounted) {
-        // Converte o Timestamp (do Firestore) para DateTime para o construtor da tela
-        DateTime dataInicioDateTime = (cofreData['dataInicio'] as Timestamp).toDate();
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => Cofre(
-              cofreNome: nome,
-              valorAlvo: (cofreData['valorAlvo'] as num).toDouble(),
-              valorAtual: (cofreData['valorAtual'] as num).toDouble(),
-              dataInicio: dataInicioDateTime,
-              codigoAcesso: cofreData['codigoAcesso'],
-            ),
-          ),
-        );
-      }
-    } else {
-      // FALHA!
-      String message = 'Erro ao entrar no cofre. Tente novamente.';
-      if (cofreData != null && cofreData.containsKey('error')) {
-        String errorCode = cofreData['error'];
-        if (errorCode == 'cofre-not-found') {
-          message = 'Código de acesso inválido.';
-        } else if (errorCode == 'already-member') {
-          message = 'Você já é membro deste cofre.';
-        } else if (errorCode == 'user-not-logged-in') {
-          message = 'Você precisa estar logado.';
-        }
-      }
-      _showSnackBar(message, isError: true);
-    }
+    // --- Toda a lógica de 'await', 'setState', 'Navigator' e 'if (sucesso)' foi REMOVIDA ---
   }
   
   @override
@@ -103,7 +72,42 @@ class _EntracofreState extends State<Entracofre> {
 
   @override
   Widget build(BuildContext context) {
-    // OBS: Adicionei 'const' em vários lugares para otimização
+    
+    // TODO: Obtenha o estado (isLoading) do seu gerenciador
+    // Exemplo com Provider:
+    // final isLoading = context.watch<SeuCofreProvider>().isLoading;
+    
+    // Usando um valor fictício por enquanto:
+    final bool isLoading = false; // TODO: Substitua pelo seu estado real
+
+    // TODO: Para lidar com Navegação e SnackBars (Sucesso/Erro)
+    // Você deve "ouvir" o estado do seu provider.
+    /*
+    Exemplo de "listener" para efeitos colaterais:
+    context.listen<SeuCofreProvider>(
+      (previous, next) {
+        // Se o status mudou para "sucesso"
+        if (next.status == CofreStatus.success && next.justJoinedCofre) { 
+          _showSnackBar('Cofre acessado com sucesso!', isError: false);
+          
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                // Navega para a tela Cofre refatorada,
+                // que buscará os dados do provider.
+                builder: (context) => const Cofre(), 
+              ),
+            );
+          }
+        } 
+        // Se o status mudou para "erro"
+        else if (next.status == CofreStatus.error) {
+          _showSnackBar(next.errorMessage ?? 'Erro desconhecido', isError: true);
+        }
+      },
+    );
+    */
+
     return Scaffold(
       backgroundColor: const Color(0xFF1E90FF),
       body: Column(
@@ -137,9 +141,9 @@ class _EntracofreState extends State<Entracofre> {
                     const SizedBox(height: 20.0),
                     // CAMPO PARA CÓDIGO
                     TextField(
-                      controller: _codigoController, // LIGADO AO CONTROLADOR
-                      keyboardType: TextInputType.text, // MANTIDO como text (código alfanumérico)
-                      textCapitalization: TextCapitalization.characters, // Facilita input de código
+                      controller: _codigoController,
+                      keyboardType: TextInputType.text,
+                      textCapitalization: TextCapitalization.characters,
                       decoration: InputDecoration(
                         labelText: 'Código do Cofre',
                         labelStyle: GoogleFonts.poppins(),
@@ -155,7 +159,9 @@ class _EntracofreState extends State<Entracofre> {
 
                     // BOTÃO DE CONFIRMAR
                     ElevatedButton(
-                      onPressed: _isLoading ? null : _handleJoinCofre, // LIGADO À LÓGICA
+                      // 1. O 'onPressed' agora usa o 'isLoading' vindo do provider
+                      // 2. A ação agora é uma chamada simples, sem 'async'
+                      onPressed: isLoading ? null : _handleJoinCofre,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1E90FF),
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -163,17 +169,18 @@ class _EntracofreState extends State<Entracofre> {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                            )
-                          : Text(
-                              'Entrar no Cofre',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 18, color: Colors.white),
-                            ),
+                      // O 'child' também usa o 'isLoading' do provider
+                      child: isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          )
+                        : Text(
+                            'Entrar no Cofre',
+                            style: GoogleFonts.poppins(
+                                fontSize: 18, color: Colors.white),
+                          ),
                     ),
                   ],
                 ),

@@ -1,33 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:travelbox/views/sharecode.dart';
 import 'package:travelbox/views/modules/footbar.dart';
 import 'package:travelbox/views/modules/header.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
+import 'package:travelbox/views/historicoContr.dart';
 
-class Cofre extends StatefulWidget {
-  // --- PARÂMETROS OBRIGATÓRIOS RECEBIDOS ---
-  final String cofreNome;
-  final double valorAlvo;
-  final double valorAtual;
-  final DateTime dataInicio;
-  final String codigoAcesso; 
+// TODO: Importe seu Model e seu Provider/Gerenciador de Estado aqui
+// ex: import 'package:travelbox/models/cofre_model.dart';
+// ex: import 'package:provider/provider.dart';
 
-  const Cofre({
-    super.key,
-    required this.cofreNome,
-    required this.valorAlvo,
-    required this.valorAtual,
-    required this.dataInicio,
-    required this.codigoAcesso,
-  });
+class Cofre extends StatelessWidget {
+  // 1. O Construtor agora é limpo, sem parâmetros de dados
+  Cofre({super.key});
 
-  @override
-  State<Cofre> createState() => _CofreState();
-}
-
-class _CofreState extends State<Cofre> {
   // --- Formatação de Moeda e Data ---
+  // (Movidos para dentro do build ou podem ficar aqui se preferir)
   final NumberFormat _currencyFormat = NumberFormat.currency(
     locale: 'pt_BR', 
     symbol: 'R\$',
@@ -37,6 +24,7 @@ class _CofreState extends State<Cofre> {
   final DateFormat _dateFormat = DateFormat('dd/MM/yyyy');
 
   // --- Widgets de Informação Reutilizáveis ---
+  // (Este método auxiliar continua igual)
   Widget _buildInfoCard({required String title, required String value, required IconData icon}) {
     return Card(
       elevation: 4,
@@ -60,7 +48,7 @@ class _CofreState extends State<Cofre> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 20),
             Text(
               value,
               style: GoogleFonts.poppins(
@@ -70,6 +58,7 @@ class _CofreState extends State<Cofre> {
               ),
             ),
           ],
+          
         ),
       ),
     );
@@ -77,14 +66,29 @@ class _CofreState extends State<Cofre> {
 
   @override
   Widget build(BuildContext context) {
-    // Cálculo e Formatação dos Dados do Cofre (usando widget.propriedade)
-    // Garante que o progresso está entre 0.0 e 1.0
-    double progress = (widget.valorAtual / widget.valorAlvo).clamp(0.0, 1.0);
-    double valorRestante = widget.valorAlvo - widget.valorAtual;
     
-    String valorAtualFormatado = _currencyFormat.format(widget.valorAtual);
-    String valorAlvoFormatado = _currencyFormat.format(widget.valorAlvo);
-    String dataInicioFormatada = _dateFormat.format(widget.dataInicio);
+    var cofreModel = {
+      'cofreNome': 'Viagem (Exemplo)',
+      'valorAtual': 100.0,
+      'valorAlvo': 1000.0,
+      'dataInicio': DateTime.now(),
+      'codigoAcesso': 'XYZ987'
+    };
+    // NOTA: Use seu model tipado, ex: final CofreModel cofreModel = ...
+
+
+    // 3. LÓGICA DE FRONT-END (Cálculos de exibição)
+    // Agora usando 'cofreModel' ao invés de 'widget.'
+    double valorAtual = cofreModel['valorAtual'] as double;
+    double valorAlvo = cofreModel['valorAlvo'] as double;
+    DateTime dataInicio = cofreModel['dataInicio'] as DateTime;
+
+    double progress = (valorAtual / valorAlvo).clamp(0.0, 1.0);
+    double valorRestante = valorAlvo - valorAtual;
+    
+    String valorAtualFormatado = _currencyFormat.format(valorAtual);
+    String valorAlvoFormatado = _currencyFormat.format(valorAlvo);
+    String dataInicioFormatada = _dateFormat.format(dataInicio);
     String valorRestanteFormatado = _currencyFormat.format(valorRestante.clamp(0.0, double.infinity));
 
 
@@ -109,9 +113,9 @@ class _CofreState extends State<Cofre> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 30.0),
-                    // TÍTULO DO COFRE
+                    // TÍTULO DO COFRE (vindo do model)
                     Text(
-                      widget.cofreNome,
+                      cofreModel['cofreNome'] as String, // 4. Usando o model
                       textAlign: TextAlign.center,
                       style: GoogleFonts.lato(
                         fontSize: 24.0,
@@ -124,7 +128,7 @@ class _CofreState extends State<Cofre> {
                     // SALDO ATUAL
                     _buildInfoCard(
                       title: 'Saldo Atual',
-                      value: valorAtualFormatado,
+                      value: valorAtualFormatado, // 4. Usando o model
                       icon: Icons.account_balance_wallet,
                     ),
                     
@@ -133,31 +137,25 @@ class _CofreState extends State<Cofre> {
                     // --- VISUALIZAÇÃO DE PROGRESSO DO COFRE ---
                     Center(
                       child: SizedBox(
-                        width: 100, // Define a área do ícone
+                        width: 100,
                         height: 100,
                         child: Stack(
                           children: [
-                            // 1. Ícone Cheio (Preenchimento)
                             ClipRect(
-                              // Alinha ao topo para que o recorte mostre a parte de baixo (o preenchimento)
                               child: Align(
                                 alignment: Alignment.topCenter, 
-                                heightFactor: progress, // Controla a altura do preenchimento (0.0 a 1.0)
+                                heightFactor: progress, // 4. Usando o model
                                 child: const Icon(
                                   Icons.savings,
                                   size: 100,
-                                  color: Color(0xFF1E90FF), // Cor do cofre cheio
+                                  color: Color(0xFF1E90FF),
                                 ),
                               ),
                             ),
-                            
-                            // 2. Ícone Vazio (Contorno/Fundo)
-                            // Colocado por cima para dar a sensação de contorno, 
-                            // embora com ícones sólidos isso seja um desafio visual.
                             const Icon(
                               Icons.savings,
                               size: 100,
-                              color: Colors.grey, // Cor do cofre vazio
+                              color: Colors.grey,
                             ),
                           ],
                         ),
@@ -167,7 +165,7 @@ class _CofreState extends State<Cofre> {
 
                     // Texto de porcentagem
                     Text(
-                      '${(progress * 100).toStringAsFixed(1)}% da Meta alcançada',
+                      '${(progress * 100).toStringAsFixed(1)}% da Meta alcançada', // 4. Usando o model
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.bold, color: const Color(0xFF1E90FF)),
                     ),
@@ -179,7 +177,7 @@ class _CofreState extends State<Cofre> {
                         Expanded(
                           child: _buildInfoCard(
                             title: 'Valor Alvo',
-                            value: valorAlvoFormatado,
+                            value: valorAlvoFormatado, // 4. Usando o model
                             icon: Icons.flag,
                           ),
                         ),
@@ -187,7 +185,7 @@ class _CofreState extends State<Cofre> {
                         Expanded(
                           child: _buildInfoCard(
                             title: 'Restante',
-                            value: valorRestanteFormatado,
+                            value: valorRestanteFormatado, // 4. Usando o model
                             icon: Icons.trending_down,
                           ),
                         ),
@@ -200,7 +198,7 @@ class _CofreState extends State<Cofre> {
                         Expanded(
                           child: _buildInfoCard(
                             title: 'Início da Viagem',
-                            value: dataInicioFormatada,
+                            value: dataInicioFormatada, // 4. Usando o model
                             icon: Icons.calendar_today,
                           ),
                         ),
@@ -208,7 +206,7 @@ class _CofreState extends State<Cofre> {
                         Expanded(
                           child: _buildInfoCard(
                             title: 'Código de Acesso',
-                            value: widget.codigoAcesso,
+                            value: cofreModel['codigoAcesso'] as String, // 4. Usando o model
                             icon: Icons.lock_open,
                           ),
                         ),
@@ -220,14 +218,10 @@ class _CofreState extends State<Cofre> {
                     // BOTÃO PRINCIPAL (Adicionar/Ver Itens)
                     ElevatedButton(
                       onPressed: () {
-                        // Direcionar para a tela CodigoCofre, passando o código
+                        // acesso para a tela de Histórico de Contribuições
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => CodigoCofre(
-                              codigoAcesso: widget.codigoAcesso, // Passando o parâmetro
-                            )
-                          ),
+                          MaterialPageRoute(builder: (context) => HistoricoContr()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -238,7 +232,7 @@ class _CofreState extends State<Cofre> {
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                       ),
                       child: Text(
-                        'Adicionar/Ver Itens',
+                        'Histórico de Contribuições',
                         style: GoogleFonts.poppins(
                           fontSize: 18,
                           color: Colors.white,
