@@ -4,8 +4,8 @@ import 'package:travelbox/views/login.dart';
 import 'package:travelbox/views/modules/header.dart';
 
 // NOVAS IMPORTAÇÕES NECESSÁRIAS
-import '../models/auth_service.dart'; // Para autenticação (Email/Senha)
-import '../models/user_service.dart'; // Para salvar dados (Nome, CPF, Tel)
+import '../services/AuthService.dart'; // Para autenticação (Email/Senha)
+import '../services/FirestoreService.dart'; // Para salvar dados (Nome, CPF, Tel)
 import 'package:firebase_auth/firebase_auth.dart'; // Para o tipo User?
 
 class Register extends StatefulWidget {

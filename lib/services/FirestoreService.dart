@@ -1,0 +1,225 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:travelbox/models/cofre.dart';
+import 'package:travelbox/models/contribuicao.dart';
+import 'package:travelbox/models/nivelPermissao.dart';
+import 'package:travelbox/models/permissao.dart';
+import 'package:travelbox/models/Usuario.dart';
+import 'package:travelbox/models/convite.dart'; 
+
+class FirestoreService {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  // ========================== MÉTODOS DE USUÁRIO ========================================
+
+  /// Cria o documento de um usuário na coleção 'users'.
+  Future<void> criarUsuario(Usuario usuario) async {
+    await _db.collection('users').doc(usuario.id).set(usuario.toJson());
+  }
+
+  /// Busca um usuário pelo seu ID (uid).
+  Future<Usuario?> getUsuario(String uid) async {
+    final doc = await _db.collection('users').doc(uid).get();
+    if (doc.exists) {
+      return Usuario.fromFirestore(doc);
+    }
+    return null;
+  }
+
+
+
+  // ========================== MÉTODOS DE COFRE ========================================
+
+
+  /// Cria um novo cofre E JÁ ADICIONA O CRIADOR COMO ADMIN
+  Future<Cofre> criarCofre(Cofre cofre, String creatorUserId) async {
+    final docRef = _db.collection('cofres').doc(); 
+    
+    // Usa o copyWith para adicionar o ID gerado
+    Cofre cofreComId = cofre.copyWith(id: docRef.id);
+    await docRef.set(cofreComId.toJson());
+    
+    // !! IMPORTANTE: Adiciona o criador como Admin
+    Permissao adminPerm = Permissao(
+      id: null, // O Firestore vai gerar o ID
+      idUsuario: creatorUserId,
+      idCofre: cofreComId.id!,
+      nivelPermissao: NivelPermissao.coordenador,
+    );
+    // Chama o método para criar a permissão
+    await criarPermissao(adminPerm);
+    
+    return cofreComId;
+  }
+
+  /// MÉTODO NOVO: Encontra um cofre pelo seu código de entrada
+  Future<Cofre?> findCofreByCode(String code) async {
+    // Busca na coleção 'cofres' onde o 'joinCode' é igual ao código
+    final snapshot = await _db
+        .collection('cofres')
+        .where('joinCode', isEqualTo: code)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      return null; // Nenhum cofre encontrado
+    }
+    
+    // Retorna o primeiro cofre encontrado
+    return Cofre.fromFirestore(snapshot.docs.first);
+  }
+
+  /// MÉTODO NOVO (ou atualizado): Adiciona uma permissão
+  /// (Usado tanto pelo criador quanto por quem entra)
+  Future<void> criarPermissao(Permissao permissao) async {
+    // Primeiro, verifica se a permissão já existe
+    final existing = await _db.collection('permissoes')
+      .where('idUsuario', isEqualTo: permissao.idUsuario)
+      .where('idCofre', isEqualTo: permissao.idCofre)
+      .limit(1)
+      .get();
+      
+    // Se não existir, cria a nova permissão
+    if (existing.docs.isEmpty) {
+      await _db.collection('permissoes').add(permissao.toJson());
+    }
+    // Se já existir, não faz nada (usuário já está no cofre)
+  }
+
+  /// Busca todos os cofres aos quais um usuário tem permissão.
+  Future<List<Cofre>> getCofresDoUsuario(String userId) async {
+    try {
+      // 1. Busca todas as permissões desse usuário (igual a antes)
+      final permissoesSnap = await _db
+          .collection('permissoes')
+          .where('idUsuario', isEqualTo: userId)
+          .get();
+
+      // 2. Extrai os IDs dos cofres (igual a antes)
+      final cofreIds = permissoesSnap.docs
+          .map((doc) => (doc.data())['idCofre'] as String)
+          .toSet()
+          .toList();
+
+      if (cofreIds.isEmpty) {
+        return []; // Usuário não tem permissão em nenhum cofre
+      }
+
+
+
+      // ----- NOVA LÓGICA DE FATIAMENTO (CHUNKING) -----
+      
+      // 3. Prepara a lista final onde todos os resultados serão combinados
+      final List<Cofre> todosOsCofres = [];
+      
+      // 4. Define o tamanho do "fatiador"
+      const int chunkSize = 10;
+
+      // 5. Loop que avança de 10 em 10 (i = 0, i = 10, i = 20, ...)
+      for (int i = 0; i < cofreIds.length; i += chunkSize) {
+        
+        // 6. Calcula o índice final do pedaço (chunk)
+        // Cuidado para não ultrapassar o final da lista
+        int end = (i + chunkSize > cofreIds.length) ? cofreIds.length : i + chunkSize;
+        
+        // 7. Pega a sub-lista (o "pedaço" de no máximo 10 IDs)
+        final List<String> chunk = cofreIds.sublist(i, end);
+
+        // 8. Executa a consulta APENAS para esse pedaço
+        final cofresSnap = await _db
+            .collection('cofres')
+            .where(FieldPath.documentId, whereIn: chunk) // 'chunk' tem no máx. 10 itens
+            .get();
+
+        // 9. Converte os documentos e adiciona na lista final
+        todosOsCofres.addAll(
+          cofresSnap.docs.map((doc) => Cofre.fromFirestore(doc)).toList()
+        );
+      }
+      
+      // 10. Retorna a lista combinada de todas as consultas
+      return todosOsCofres;
+
+    } catch (e) {
+      print("Erro ao buscar cofres: $e");
+      return [];
+    }
+  }
+
+//========================= Cofre Finalizado ======================================
+
+
+  // ----- MÉTODOS DE CONTRIBUIÇÃO -----
+
+  /// Adiciona uma nova contribuição a um cofre.
+  Future<void> addContribuicao(Contribuicao contribuicao) async {
+    await _db.collection('contribuicoes').add(contribuicao.toJson());
+  }
+
+  /// Busca todas as contribuições de um cofre específico.
+  Future<List<Contribuicao>> getContribuicoesDoCofre(String cofreId) async {
+    final snapshot = await _db
+        .collection('contribuicoes')
+        .where('idCofre', isEqualTo: cofreId)
+        .orderBy('data', descending: true)
+        .get();
+        
+    return snapshot.docs.map((doc) => Contribuicao.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)).toList();
+  }
+
+  // ----- MÉTODOS DE PERMISSÃO -----
+
+  /// Adiciona uma permissão para um usuário em um cofre.
+  Future<void> addPermissao(Permissao permissao) async {
+    await _db.collection('permissoes').add(permissao.toJson());
+  }
+
+  /// Remove a permissão de um usuário para um cofre específico.
+  Future<void> removePermissao(String idUsuario, String idCofre) async {
+    final snapshot = await _db
+        .collection('permissoes')
+        .where('idUsuario', isEqualTo: idUsuario)
+        .where('idCofre', isEqualTo: idCofre)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      await snapshot.docs.first.reference.delete();
+    }
+  }
+
+  /// Busca todas as permissões de um cofre específico.
+  Future<List<Permissao>> getPermissoesDoCofre(String cofreId) async {
+    final snapshot = await _db
+        .collection('permissoes')
+        .where('idCofre', isEqualTo: cofreId)
+        .get();
+        
+    return snapshot.docs.map((doc) => Permissao.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)).toList();
+  }
+
+  // ----- MÉTODOS DE CONVITE -----
+
+  /// Cria um novo convite para um cofre.
+  Future<Convite> criarConvite(Convite convite) async {
+    final docRef = await _db.collection('convites').add(convite.toJson());
+    return convite.copyWith(id: docRef.id);
+  }
+
+  /// Busca todos os convites pendentes para um determinado e-mail (usuário convidado).
+  Future<List<Convite>> getConvitesParaEmail(String email) async {
+    final snapshot = await _db
+        .collection('convites')
+        .where('emailConvidado', isEqualTo: email.toLowerCase())
+        .where('status', isEqualTo: 'pendente')
+        .get();
+        
+    return snapshot.docs.map((doc) => Convite.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)).toList();
+  }
+
+  /// Deleta um convite após ser aceito ou rejeitado.
+  Future<void> aceitarOuRejeitarConvite(String conviteId) async {
+    await _db.collection('convites').doc(conviteId).delete();
+  }
+}
+
+/// todos os métodos sservices deixar auqi

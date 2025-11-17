@@ -9,6 +9,9 @@ import 'package:travelbox/views/cofre.dart';
 // TODO: Importe seu Provider/Gerenciador de Estado aqui
 // ex: import 'package:provider/provider.dart';
 // ex: import 'package:travelbox/providers/cofre_provider.dart';
+import 'home.dart'; // Importa a tela principal (Dashboard)
+import 'package:cloud_firestore/cloud_firestore.dart'; // Necessário para o Timestamp
+import '../services/FirestoreService.dart'; // Serviço para lógica do Cofre
 
 class Entracofre extends StatefulWidget {
   const Entracofre({super.key});
@@ -35,9 +38,12 @@ class _EntracofreState extends State<Entracofre> {
     );
   }
 
-  // --- Lógica da View: Apenas "dispara" o evento ---
-  void _handleJoinCofre() {
-    // 1. Pega os dados da UI
+  // --- Lógica de Entrar no Cofre ---
+  void _handleJoinCofre() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     final codigoAcesso = _codigoController.text.trim().toUpperCase();
 
     // 2. Validação local da UI
@@ -61,6 +67,54 @@ class _EntracofreState extends State<Entracofre> {
     // );
 
     // --- Toda a lógica de 'await', 'setState', 'Navigator' e 'if (sucesso)' foi REMOVIDA ---
+    // Chama o serviço para tentar entrar no cofre
+    Map<String, dynamic>? cofreData = await _cofreService.joinCofre(
+      codigoAcesso: codigoAcesso,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (cofreData != null && !cofreData.containsKey('error')) {
+      // SUCESSO!
+      final nome = cofreData['nome'];
+      _showSnackBar('Cofre "$nome" acessado com sucesso!', isError: false);
+
+      // Navega para a tela HOME (agora é o Dashboard)
+      if (mounted) {
+        // Converte o Timestamp (do Firestore) para DateTime
+        DateTime dataInicioDateTime = (cofreData['dataInicio'] as Timestamp).toDate();
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => Home( // NAVEGAÇÃO FINAL
+              cofreNome: nome,
+              valorAlvo: (cofreData['valorAlvo'] as num).toDouble(),
+              valorAtual: (cofreData['valorAtual'] as num).toDouble(),
+              dataInicio: dataInicioDateTime,
+              codigoAcesso: cofreData['codigoAcesso'],
+            ),
+          ),
+        );
+      }
+    } else {
+      // FALHA!
+      String message = 'Erro ao entrar no cofre. Tente novamente.';
+      if (cofreData != null && cofreData.containsKey('error')) {
+        String errorCode = cofreData['error'];
+        if (errorCode == 'cofre-not-found') {
+          message = 'Código de acesso inválido.';
+        } else if (errorCode == 'already-member') {
+          message = 'Você já é membro deste cofre.';
+        } else if (errorCode == 'user-not-logged-in') {
+          message = 'Você precisa estar logado.';
+        } else {
+          message = 'Erro no servidor. Tente mais tarde.';
+        }
+      }
+      _showSnackBar(message, isError: true);
+    }
   }
   
   @override
@@ -162,6 +216,7 @@ class _EntracofreState extends State<Entracofre> {
                       // 1. O 'onPressed' agora usa o 'isLoading' vindo do provider
                       // 2. A ação agora é uma chamada simples, sem 'async'
                       onPressed: isLoading ? null : _handleJoinCofre,
+                      onPressed: _isLoading ? null : _handleJoinCofre, 
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1E90FF),
                         padding: const EdgeInsets.symmetric(vertical: 16.0),

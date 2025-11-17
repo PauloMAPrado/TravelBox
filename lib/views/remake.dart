@@ -1,38 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+// Imports que você forneceu:
+import 'package:travelbox/views/login.dart';
 import 'package:travelbox/views/modules/header.dart';
-//import 'package:travelbox/services/AuthService.dart'; // Importe o serviço
-//import 'package:travelbox/services/FirestoreService.dart'; // Importe a dependência
 
-class Recover extends StatefulWidget {
-  const Recover({super.key});
+class Remake extends StatefulWidget {
+  const Remake({super.key});
 
   @override
-  _RecoverState createState() => _RecoverState();
+  _RemakeState createState() => _RemakeState();
 }
 
-class _RecoverState extends State<Recover> {
-  final _emailController = TextEditingController();
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
-  }
-
+class _RemakeState extends State<Remake> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1E90FF),
+      backgroundColor: const Color(0xFF1E90FF),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Header(), 
+          const Header(), // Adicionado 'const'
 
           //container
           Expanded(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
+                // Adicionado 'const'
                 color: Color(0xFFF4F9FB),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(50.0),
@@ -45,26 +38,25 @@ class _RecoverState extends State<Recover> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      SizedBox(height: 40.0),
+                      const SizedBox(height: 40.0), 
 
                       //Título
                       Text(
-                        'Recuperação de Senha',
+                        'Alterar Senha',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                           fontSize: 17.0,
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 0, 0, 0),
+                          color: const Color.fromARGB(255, 0, 0, 0), 
                         ),
                       ),
-                      SizedBox(height: 180.0),
+                      const SizedBox(height: 180.0), 
 
-                      //Email
+                      //Senha
                       TextField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
+                        obscureText: true,
                         decoration: InputDecoration(
-                          labelText: 'Email',
+                          labelText: 'Nova senha',
                           labelStyle: GoogleFonts.poppins(),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -74,58 +66,46 @@ class _RecoverState extends State<Recover> {
                         ),
                         style: GoogleFonts.poppins(),
                       ),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0), // Adicionado 'const'
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Insira seu email para receber o link de recuperação',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                            ),
+                      //Confirmar Senha
+                      TextField(
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Confirmar nova senha',
+                          labelStyle: GoogleFonts.poppins(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
                           ),
-                        ],
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        style: GoogleFonts.poppins(),
                       ),
+                      const SizedBox(height: 45.0), // Adicionado 'const'
 
-                      SizedBox(height: 16.0),
-
-                      //Enviar
                       ElevatedButton(
                         onPressed: () {
-
-     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Link de recuperação enviado para o seu email!',
-          style: GoogleFonts.poppins(color: Colors.white),
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        duration: Duration(seconds: 5),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-
-    Navigator.pop(context, true);
-
                         },
+
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF1E90FF),
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                          backgroundColor: const Color(0xFF1E90FF),
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
                         child: Text(
-                          'Enviar',
+                          'Confirmar Senha',
                           style: GoogleFonts.poppins(
-                              fontSize: 18, color: Colors.white),
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
+                      const SizedBox(
+                          height: 30.0),
                     ],
                   ),
                 ),
