@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:travelbox/views/settings.dart';
+import 'package:travelbox/views/home.dart';
 import 'package:travelbox/views/account.dart';
 import 'package:travelbox/views/premium.dart';
 
@@ -15,16 +15,7 @@ class Footbarr extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          IconButton(
-            icon: Icon(Icons.settings, color: Color(0xFF1E90FF)),
-            iconSize: 40,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Settings()),
-              );
-            },
-          ),
+          
           IconButton(
             icon: Icon(Icons.account_circle, color: Color(0xFF1E90FF)),
             iconSize: 40,
@@ -36,12 +27,22 @@ class Footbarr extends StatelessWidget {
             },
           ),
           IconButton(
+            icon: Icon(Icons.home, color: Color(0xFF1E90FF)),
+            iconSize: 40,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Home()),
+              );
+            },
+          ),
+          IconButton(
             icon: Icon(Icons.star, color: Color(0xFF1E90FF)),
             iconSize: 40,
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Premium()),
+                MaterialPageRoute(builder: (context) => Pro()),
               );
             },
           ),

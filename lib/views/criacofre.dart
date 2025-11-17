@@ -3,10 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:travelbox/views/modules/footbar.dart';
 import 'package:travelbox/views/modules/header.dart';
 import 'package:travelbox/views/cofre.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Importado para usar Timestamp
-
-// Importar o serviço que acabamos de criar (assumindo que o caminho está correto)
-import '../models/cofre_service.dart'; 
 
 class Criacofre extends StatefulWidget {
   const Criacofre({super.key});
@@ -16,12 +12,13 @@ class Criacofre extends StatefulWidget {
 }
 
 class _CriacofreState extends State<Criacofre> {
-  // --- Controladores e Serviços ---
+  // --- Controladores (Estado local da UI) ---
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _dataInicioController = TextEditingController();
   final TextEditingController _valorAlvoController = TextEditingController();
-  final CofreService _cofreService = CofreService();
-  bool _isLoading = false;
+
+  // --- O CofreService e o _isLoading foram REMOVIDOS ---
+  // Eles agora vivem no seu gerenciador de estado (Provider, Bloc, etc.)
 
   void _showSnackBar(String message, {bool isError = false}) {
     if (!mounted) return;
@@ -34,67 +31,39 @@ class _CriacofreState extends State<Criacofre> {
     );
   }
 
-  // --- Lógica de Criação do Cofre ---
-  void _handleCreateCofre() async {
-    setState(() { _isLoading = true; });
-
+  // --- Lógica da View: Apenas "dispara" o evento ---
+  void _handleCreateCofre() {
+    // 1. Pega os dados da UI
     final nome = _nomeController.text.trim();
     final dataInicio = _dataInicioController.text.trim();
     final valorAlvo = _valorAlvoController.text.trim();
 
-    // Validação básica
+    // 2. Validação local da UI
     if (nome.isEmpty || dataInicio.isEmpty || valorAlvo.isEmpty) {
       _showSnackBar('Preencha todos os campos.', isError: true);
-      setState(() { _isLoading = false; });
       return;
     }
 
-    // Chama o serviço para criar o cofre e espera o Map de dados
-    Map<String, dynamic>? cofreData = await _cofreService.createNewCofre(
-      nome: nome,
-      dataInicio: dataInicio,
-      valorAlvo: valorAlvo,
-    );
+    // 3. "Dispara" o evento para o gerenciador de estado
+    // A View não é mais 'async' e não espera uma resposta.
+    // Ela apenas envia os dados e confia que o gerenciador fará o resto.
+    
+    // TODO: Chame seu gerenciador de estado aqui
+    // Exemplo com Provider:
+    // context.read<SeuCofreProvider>().createNewCofre(
+    //   nome: nome,
+    //   dataInicio: dataInicio,
+    //   valorAlvo: valorAlvo,
+    // );
+    
+    // Exemplo com Riverpod:
+    // ref.read(seuCofreProvider.notifier).createNewCofre(
+    //   nome: nome,
+    //   dataInicio: dataInicio,
+    //   valorAlvo: valorAlvo,
+    // );
 
-    setState(() { _isLoading = false; });
-
-    // Verifica se a criação foi um sucesso (não é nulo e não tem chave 'error')
-    if (cofreData != null && !cofreData.containsKey('error')) {
-      // SUCESSO!
-      _showSnackBar('Cofre "$nome" criado com sucesso!', isError: false);
-      
-      if (mounted) {
-        // Converte a data (Timestamp) para DateTime para o construtor da tela
-        DateTime dataInicioDateTime = (cofreData['dataInicio'] as Timestamp).toDate();
-                            
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => Cofre( 
-              cofreNome: cofreData['nome'],
-              // CORREÇÃO: Usando 'as num' e '.toDouble()' para resolver o erro de tipagem
-              valorAlvo: (cofreData['valorAlvo'] as num).toDouble(),
-              valorAtual: (cofreData['valorAtual'] as num).toDouble(),
-              dataInicio: dataInicioDateTime, // Passa o DateTime
-              codigoAcesso: cofreData['codigoAcesso'],
-            ),
-          ),
-        );
-      }
-    } else {
-      // FALHA! 
-      String message = 'Erro ao criar cofre. Tente novamente.';
-      if (cofreData != null && cofreData.containsKey('error')) {
-        String errorCode = cofreData['error'];
-        if (errorCode == 'user-not-logged-in') {
-          message = 'Você precisa estar logado para criar um cofre.';
-        } else if (errorCode == 'firestore-error') {
-          message = 'Erro ao salvar dados. Verifique suas regras do Firestore.';
-        } else if (errorCode == 'invalid-date-format') {
-          message = 'Formato de Data Inválido. Use YYYY-MM-DD.';
-        }
-      }
-      _showSnackBar(message, isError: true);
-    }
+    // --- Toda a lógica de 'await', 'setState', 'Navigator' e 'if (sucesso)' foi REMOVIDA ---
   }
 
   @override
@@ -108,6 +77,43 @@ class _CriacofreState extends State<Criacofre> {
 
   @override
   Widget build(BuildContext context) {
+    
+    // TODO: Obtenha o estado (isLoading) do seu gerenciador
+    // Exemplo com Provider:
+    // final isLoading = context.watch<SeuCofreProvider>().isLoading;
+    
+    // Observação: por enquanto não usamos um flag local; o gerenciador de estado
+    // deve controlar habilitação/feedback visual (loading) da ação.
+
+    // TODO: Para lidar com Navegação e SnackBars (Sucesso/Erro)
+    // Você deve "ouvir" o estado do seu provider.
+    // O local exato depende do gerenciador (ex: BlocListener, ou 'listen' do Provider)
+    /*
+    Exemplo de "listener" para efeitos colaterais:
+    context.listen<SeuCofreProvider>(
+      (previous, next) {
+        // Se o status mudou para "sucesso"
+        if (next.status == CofreStatus.success) { 
+          _showSnackBar('Cofre criado com sucesso!', isError: false);
+          
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                // Navega para a tela Cofre refatorada,
+                // que buscará os dados do provider.
+                builder: (context) => const Cofre(), 
+              ),
+            );
+          }
+        } 
+        // Se o status mudou para "erro"
+        else if (next.status == CofreStatus.error) {
+          _showSnackBar(next.errorMessage ?? 'Erro desconhecido', isError: true);
+        }
+      },
+    );
+    */
+
     return Scaffold(
       backgroundColor: const Color(0xFF1E90FF),
       body: Column(
@@ -194,8 +200,9 @@ class _CriacofreState extends State<Criacofre> {
                       const SizedBox(height: 25.0),
 
                       // BOTÃO CONFIRMAR
+                      // O botão redireciona para a tela inicial do cofre apos sua criação
                       ElevatedButton(
-                        onPressed: _isLoading ? null : _handleCreateCofre, 
+                        onPressed: _handleCreateCofre, 
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1E90FF),
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -203,23 +210,20 @@ class _CriacofreState extends State<Criacofre> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
-                        child: _isLoading 
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                            )
-                          : Text(
-                              'Confirmar Cadastro',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 18, color: Colors.white),
-                            ),
+                        child: Text(
+                          'Confirmar',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 25.0), 
                     ],
                   ), 
                 ),
-              ) 
+              ), 
             ), 
           ), 
           const Footbarr(),
