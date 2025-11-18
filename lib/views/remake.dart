@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 // Imports que você forneceu:
-import 'package:travelbox/views/login.dart';
 import 'package:travelbox/views/modules/header.dart';
 
 class Remake extends StatefulWidget {

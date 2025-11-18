@@ -4,9 +4,24 @@ import 'package:travelbox/views/login.dart';
 import 'package:travelbox/views/modules/header.dart';
 
 // NOVAS IMPORTAÇÕES NECESSÁRIAS
-import '../services/AuthService.dart'; // Para autenticação (Email/Senha)
+// Para autenticação (Email/Senha)
 import '../services/FirestoreService.dart'; // Para salvar dados (Nome, CPF, Tel)
 import 'package:firebase_auth/firebase_auth.dart'; // Para o tipo User?
+import 'package:cloud_firestore/cloud_firestore.dart'; // Para salvar no Firestore
+
+// Extensão para adicionar o método saveNewUser caso não exista na classe FirestoreService
+// Isso evita alterar o arquivo original do serviço e corrige o erro de compilação.
+extension FirestoreServiceSaveNewUser on FirestoreService {
+  Future<void> saveNewUser(String uid, String nome, String cpf, String telefone) async {
+    final CollectionReference users = FirebaseFirestore.instance.collection('users');
+    await users.doc(uid).set({
+      'nome': nome,
+      'cpf': cpf,
+      'telefone': telefone,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+}
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -25,8 +40,7 @@ class _RegisterState extends State<Register> {
   final TextEditingController _confirmarSenhaController = TextEditingController();
 
   // --- Serviços e Estado ---
-  final AuthService _auth = AuthService();
-  final UserService _userService = UserService(); // NOVO: Instância do serviço de dados
+  final FirestoreService _userService = FirestoreService(); // NOVO: Instância do serviço de dados
   bool _isLoading = false;
 
   // --- Funções de Feedback ---
@@ -70,7 +84,20 @@ class _RegisterState extends State<Register> {
     }
 
     // 3. Cadastrar no Firebase AUTH
-    User? user = await _auth.signUpWithEmail(email, password);
+    User? user;
+    try {
+      UserCredential credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      user = credential.user;
+    } on FirebaseAuthException catch (e) {
+      user = null;
+      _showSnackBar('Falha no cadastro: ${e.message}', isError: true);
+    } catch (e) {
+      user = null;
+      _showSnackBar('Falha no cadastro. Tente novamente.', isError: true);
+    }
 
     if (user != null) {
       try {

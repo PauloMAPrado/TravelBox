@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:travelbox/views/modules/footbar.dart';
-import 'package:travelbox/views/modules/header.dart';
 
 class HistoricoContr extends StatelessWidget {
   const HistoricoContr({super.key});
