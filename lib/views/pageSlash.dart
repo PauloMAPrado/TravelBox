@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:travelbox/views/login.dart';
 
 // Primeira tela (Splash Screen)
-class PrimeiraTela extends StatelessWidget {
-  const PrimeiraTela({super.key});
+class TelaSplash extends StatelessWidget {
+  const TelaSplash({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +28,11 @@ class PrimeiraTela extends StatelessWidget {
               width: 250,
             ),
             const SizedBox(height: 20),
+
+            CircularProgressIndicator(),
+            
+            const SizedBox(height: 16),
+
             Text(
               'Carregando...',
               style: GoogleFonts.poppins(
