@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:travelbox/views/home.dart';
+import 'package:travelbox/views/login.dart';
 import 'package:travelbox/views/pageSlash.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
@@ -35,12 +36,15 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ],
-        return child: MaterialApp(
-          debugShowCheckedModeBanner: false,
 
-          home: _getTelaInicial(AuthStore.sessionStatus),
-        );
-      },
+      child: Consumer<AuthStore>(
+        builder: (context, authStore, _) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: _getTelaInicial(authStore.sessionStatus),
+          );
+        },
+      ),
     );
   }
 
@@ -48,6 +52,12 @@ class MyApp extends StatelessWidget {
     switch (status) {
       case SessionStatus.authenticated:
         return Home();
+        case SessionStatus.unauthenticated:
+          return Login(); // talvez vai mudar
+        case SessionStatus.uninitialized:
+          return TelaSplash();
+        default:
+          return TelaSplash();
     }
   }
 }
