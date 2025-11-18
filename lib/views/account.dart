@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:travelbox/views/modules/footbar.dart';
 import 'package:travelbox/views/modules/header.dart';
 import 'package:travelbox/views/premium.dart';
-import 'package:travelbox/views/homecard.dart';
+import 'package:travelbox/views/homeCard.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
