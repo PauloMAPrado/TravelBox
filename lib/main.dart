@@ -1,25 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-
-// Linha original //
-// import 'package:travelbox/views/PrimeiraTela.dart';
-
-// Linha para teste
-import 'package:travelbox/views/criacofre.dart';
-
-// Importa o arquivo gerado pelo flutterfire configure:
-import 'firebase_options.dart'; 
+import 'package:travelbox/views/home.dart';
+import 'package:travelbox/views/login.dart';
+import 'package:travelbox/views/pageSlash.dart';
+import 'firebase_options.dart';
+import 'package:provider/provider.dart';
+import 'package:travelbox/services/AuthService.dart';
+import 'package:travelbox/services/FirestoreService.dart';
+import 'package:travelbox/services/authProvider.dart';
 
 void main() async {
-  // 1. Garante que a ligação entre Flutter e o código nativo esteja pronta.
-  WidgetsFlutterBinding.ensureInitialized(); 
+  WidgetsFlutterBinding.ensureInitialized();
 
-  // 2. Inicializa o Firebase com as opções corretas para a plataforma atual.
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  // 3. Inicia o aplicativo.
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -28,16 +21,43 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      // A primeira tela será a 'PrimeiraTela' (Splash Screen).
+    return MultiProvider(
+      providers: [
+        Provider<FirestoreService>(create: (_) => FirestoreService()),
 
-      // Linha original //
-      // home: PrimeiraTela(),
+        Provider<AuthService>(
+          create: (context) => AuthService(context.read<FirestoreService>()),
+        ),
 
-      // Linha para teste
-      home: Criacofre(),
-      
+        ChangeNotifierProvider<AuthStore>(
+          create: (context) => AuthStore(
+            context.read<AuthService>(),
+            context.read<FirestoreService>(),
+          ),
+        ),
+      ],
+
+      child: Consumer<AuthStore>(
+        builder: (context, authStore, _) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: _getTelaInicial(authStore.sessionStatus),
+          );
+        },
+      ),
     );
+  }
+
+  Widget _getTelaInicial(SessionStatus status) {
+    switch (status) {
+      case SessionStatus.authenticated:
+        return Home();
+        case SessionStatus.unauthenticated:
+          return Login(); // talvez vai mudar
+        case SessionStatus.uninitialized:
+          return TelaSplash();
+        default:
+          return TelaSplash();
+    }
   }
 }
