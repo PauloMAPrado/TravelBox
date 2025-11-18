@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:travelbox/views/home.dart';
 import 'package:travelbox/views/login.dart';
-import 'package:travelbox/views/pageSlash.dart';
+import 'package:travelbox/views/pageSplash.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:travelbox/services/AuthService.dart';
@@ -56,6 +56,7 @@ class MyApp extends StatelessWidget {
           return Login(); // talvez vai mudar
         case SessionStatus.uninitialized:
           return TelaSplash();
+        // ignore: unreachable_switch_default
         default:
           return TelaSplash();
     }
