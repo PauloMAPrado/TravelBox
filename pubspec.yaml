@@ -40,6 +40,7 @@ dependencies:
   google_fonts: ^6.3.2
   provider: ^6.1.5+1
   intl: ^0.18.1
+  mask_text_input_formatter: ^2.9.0
 
   
   # The "flutter_lints" package below contains a set of recommended lints to
