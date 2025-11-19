@@ -221,7 +221,7 @@ class Cofre extends StatelessWidget {
                         // acesso para a tela de Histórico de Contribuições
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => HistoricoContr()),
+                          MaterialPageRoute(builder: (context) => Historicocontr()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
