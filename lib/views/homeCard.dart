@@ -35,6 +35,18 @@ class _HomeState extends State<Home> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Card para um cofre existente com Nome, Valor Alvo e Progresso
+                    SizedBox(height: 40.0),
+                    // Título "Seus Cofres"
+                    Text(
+                      'Seus Cofres',
+                      style: GoogleFonts.poppins(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF333333),
+                      ),
+                    ),
+                    SizedBox(height: 20.0),
+
                     HomeCard(
                       cofreNome: 'Viagem para Paris',
                       valorAlvo: 5000.0,
@@ -99,6 +111,7 @@ class HomeCard extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       elevation: 2,
+      color: const Color.fromARGB(255, 252, 237, 172),
       margin: EdgeInsets.symmetric(vertical: 12.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -117,7 +130,7 @@ class HomeCard extends StatelessWidget {
               value: progress,
               minHeight: 8.0,
               color: Color(0xFF1E90FF),
-              backgroundColor: Colors.grey[200],
+              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
             ),
             SizedBox(height: 8.0),
             Row(
