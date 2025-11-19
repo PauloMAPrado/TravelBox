@@ -1,4 +1,4 @@
-# travelbox
+# CofreTrip
 
 A new Flutter project.
 
