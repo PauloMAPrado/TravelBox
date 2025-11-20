@@ -78,6 +78,29 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
+
+                    // Criar botão "Entrar usando Código" - Entrar em um cofre usando o código de acesso
+                    SizedBox(height: 20.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/entracofre');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 255, 179, 72),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                      ),
+                      child: Text(
+                        'Entrar usando Código',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -111,7 +134,7 @@ class HomeCard extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       elevation: 2,
-      color: const Color.fromARGB(255, 252, 237, 172),
+      color: const Color.fromARGB(255, 210, 233, 255),
       margin: EdgeInsets.symmetric(vertical: 12.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -151,4 +174,11 @@ class HomeCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// main para rodar apenas essa tela e testar
+void main() {
+  runApp(MaterialApp(
+    home: Home(),
+  ));
 }
