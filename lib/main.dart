@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:travelbox/controllers/cofreProvider.dart';
+import 'package:travelbox/controllers/detalhesCofreProvider.dart';
 import 'package:travelbox/views/home.dart';
 import 'package:travelbox/views/login.dart';
 import 'package:travelbox/views/pageSplash.dart';
@@ -35,7 +37,25 @@ class MyApp extends StatelessWidget {
             context.read<FirestoreService>(),
           ),
         ),
+        
+        ChangeNotifierProvider<CofreProvider>(
+          create: (context) => CofreProvider(
+            context.read<FirestoreService>(),
+          ),
+        ),
+
+        ChangeNotifierProvider<DetalhesCofreProvider>(
+          create: (context) => DetalhesCofreProvider(
+            context.read<FirestoreService>(),
+          ),
+        ),
+
+
+
+
       ],
+
+      
 
       child: Consumer<AuthStore>(
         builder: (context, authStore, _) {
@@ -62,3 +82,4 @@ class MyApp extends StatelessWidget {
     }
   }
 }
+
