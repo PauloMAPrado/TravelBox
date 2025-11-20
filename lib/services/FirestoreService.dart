@@ -4,7 +4,8 @@ import 'package:travelbox/models/contribuicao.dart';
 import 'package:travelbox/models/nivelPermissao.dart';
 import 'package:travelbox/models/permissao.dart';
 import 'package:travelbox/models/Usuario.dart';
-import 'package:travelbox/models/convite.dart'; 
+import 'package:travelbox/models/convite.dart';
+import 'package:travelbox/models/statusConvite.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -25,19 +26,16 @@ class FirestoreService {
     return null;
   }
 
-
-
   // ========================== MÉTODOS DE COFRE ========================================
-
 
   /// Cria um novo cofre E JÁ ADICIONA O CRIADOR COMO ADMIN
   Future<Cofre> criarCofre(Cofre cofre, String creatorUserId) async {
-    final docRef = _db.collection('cofres').doc(); 
-    
+    final docRef = _db.collection('cofres').doc();
+
     // Usa o copyWith para adicionar o ID gerado
     Cofre cofreComId = cofre.copyWith(id: docRef.id);
     await docRef.set(cofreComId.toJson());
-    
+
     // !! IMPORTANTE: Adiciona o criador como Admin
     Permissao adminPerm = Permissao(
       id: null, // O Firestore vai gerar o ID
@@ -47,7 +45,7 @@ class FirestoreService {
     );
     // Chama o método para criar a permissão
     await criarPermissao(adminPerm);
-    
+
     return cofreComId;
   }
 
@@ -63,7 +61,7 @@ class FirestoreService {
     if (snapshot.docs.isEmpty) {
       return null; // Nenhum cofre encontrado
     }
-    
+
     // Retorna o primeiro cofre encontrado
     return Cofre.fromFirestore(snapshot.docs.first);
   }
@@ -72,12 +70,13 @@ class FirestoreService {
   /// (Usado tanto pelo criador quanto por quem entra)
   Future<void> criarPermissao(Permissao permissao) async {
     // Primeiro, verifica se a permissão já existe
-    final existing = await _db.collection('permissoes')
-      .where('idUsuario', isEqualTo: permissao.idUsuario)
-      .where('idCofre', isEqualTo: permissao.idCofre)
-      .limit(1)
-      .get();
-      
+    final existing = await _db
+        .collection('permissoes')
+        .where('idUsuario', isEqualTo: permissao.idUsuario)
+        .where('idCofre', isEqualTo: permissao.idCofre)
+        .limit(1)
+        .get();
+
     // Se não existir, cria a nova permissão
     if (existing.docs.isEmpty) {
       await _db.collection('permissoes').add(permissao.toJson());
@@ -104,49 +103,49 @@ class FirestoreService {
         return []; // Usuário não tem permissão em nenhum cofre
       }
 
-
-
       // ----- NOVA LÓGICA DE FATIAMENTO (CHUNKING) -----
-      
+
       // 3. Prepara a lista final onde todos os resultados serão combinados
       final List<Cofre> todosOsCofres = [];
-      
+
       // 4. Define o tamanho do "fatiador"
       const int chunkSize = 10;
 
       // 5. Loop que avança de 10 em 10 (i = 0, i = 10, i = 20, ...)
       for (int i = 0; i < cofreIds.length; i += chunkSize) {
-        
         // 6. Calcula o índice final do pedaço (chunk)
         // Cuidado para não ultrapassar o final da lista
-        int end = (i + chunkSize > cofreIds.length) ? cofreIds.length : i + chunkSize;
-        
+        int end = (i + chunkSize > cofreIds.length)
+            ? cofreIds.length
+            : i + chunkSize;
+
         // 7. Pega a sub-lista (o "pedaço" de no máximo 10 IDs)
         final List<String> chunk = cofreIds.sublist(i, end);
 
         // 8. Executa a consulta APENAS para esse pedaço
         final cofresSnap = await _db
             .collection('cofres')
-            .where(FieldPath.documentId, whereIn: chunk) // 'chunk' tem no máx. 10 itens
+            .where(
+              FieldPath.documentId,
+              whereIn: chunk,
+            ) // 'chunk' tem no máx. 10 itens
             .get();
 
         // 9. Converte os documentos e adiciona na lista final
         todosOsCofres.addAll(
-          cofresSnap.docs.map((doc) => Cofre.fromFirestore(doc)).toList()
+          cofresSnap.docs.map((doc) => Cofre.fromFirestore(doc)).toList(),
         );
       }
-      
+
       // 10. Retorna a lista combinada de todas as consultas
       return todosOsCofres;
-
     } catch (e) {
       print("Erro ao buscar cofres: $e");
       return [];
     }
   }
 
-//========================= Cofre Finalizado ======================================
-
+  //========================= Cofre Finalizado ======================================
 
   // ----- MÉTODOS DE CONTRIBUIÇÃO -----
 
@@ -162,8 +161,14 @@ class FirestoreService {
         .where('idCofre', isEqualTo: cofreId)
         .orderBy('data', descending: true)
         .get();
-        
-    return snapshot.docs.map((doc) => Contribuicao.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)).toList();
+
+    return snapshot.docs
+        .map(
+          (doc) => Contribuicao.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>,
+          ),
+        )
+        .toList();
   }
 
   // ----- MÉTODOS DE PERMISSÃO -----
@@ -193,33 +198,68 @@ class FirestoreService {
         .collection('permissoes')
         .where('idCofre', isEqualTo: cofreId)
         .get();
-        
-    return snapshot.docs.map((doc) => Permissao.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)).toList();
+
+    return snapshot.docs
+        .map(
+          (doc) => Permissao.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>,
+          ),
+        )
+        .toList();
   }
 
-  // ----- MÉTODOS DE CONVITE -----
+  //====================== Membros e Convites ====================================
 
-  /// Cria um novo convite para um cofre.
-  Future<Convite> criarConvite(Convite convite) async {
-    final docRef = await _db.collection('convites').add(convite.toJson());
-    return convite.copyWith(id: docRef.id);
+  // --- NOVOS MÉTODOS PARA MEMBROS E CONVITES ---
+
+  /// Busca todos os membros (usuários) de um cofre específico
+  Future<List<Permissao>> getMembrosCofre(String cofreId) async {
+    final snapshot = await _db
+        .collection('permissoes')
+        .where('idCofre', isEqualTo: cofreId)
+        .get();
+    return snapshot.docs.map((doc) => Permissao.fromFirestore(doc)).toList();
   }
 
-  /// Busca todos os convites pendentes para um determinado e-mail (usuário convidado).
-  Future<List<Convite>> getConvitesParaEmail(String email) async {
+  /// Busca um usuário pelo E-mail (usado para enviar convites)
+  Future<Usuario?> buscarUsuarioPorEmail(String email) async {
+    final snapshot = await _db
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return Usuario.fromFirestore(snapshot.docs.first);
+    }
+    return null;
+  }
+
+  /// Envia (cria) um convite no banco
+  Future<void> criarConvite(Convite convite) async {
+    await _db.collection('convites').add(convite.toJson());
+  }
+
+  /// Busca convites que o usuário recebeu e ainda estão pendentes
+  Future<List<Convite>> getConvitesRecebidos(String userId) async {
     final snapshot = await _db
         .collection('convites')
-        .where('emailConvidado', isEqualTo: email.toLowerCase())
-        .where('status', isEqualTo: 'pendente')
+        .where('idUsuarioConvidado', isEqualTo: userId)
+        .where('status', isEqualTo: 'pendente') // Filtra só os pendentes
         .get();
-        
-    return snapshot.docs.map((doc) => Convite.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)).toList();
+    return snapshot.docs.map((doc) => Convite.fromFirestore(doc)).toList();
   }
 
-  /// Deleta um convite após ser aceito ou rejeitado.
-  Future<void> aceitarOuRejeitarConvite(String conviteId) async {
-    await _db.collection('convites').doc(conviteId).delete();
+  /// Atualiza o status de um convite (Aceitar/Recusar)
+  Future<void> responderConvite(
+    String conviteId,
+    StatusConvite novoStatus,
+  ) async {
+    await _db.collection('convites').doc(conviteId).update({
+      'status': novoStatus.name,
+    });
   }
+
+//====================== Membros e Convites implementado ===================
+
 }
-
-/// todos os métodos sservices deixar auqi
